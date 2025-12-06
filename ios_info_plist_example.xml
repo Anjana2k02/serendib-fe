@@ -1,0 +1,46 @@
+<!--
+  Example Info.plist entries for Serendib App
+  Add these entries to: ios/Runner/Info.plist
+  Insert them inside the <dict> tag
+-->
+
+<!-- Camera Permission -->
+<key>NSCameraUsageDescription</key>
+<string>We need camera access to scan QR codes and enable AR features</string>
+
+<!-- Location Permissions -->
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>We need your location to provide accurate navigation and location-based services</string>
+
+<key>NSLocationAlwaysUsageDescription</key>
+<string>We need your location to provide navigation services even when the app is in the background</string>
+
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>We need your location to provide navigation services</string>
+
+<!-- Photo Library (if needed for QR from gallery) -->
+<key>NSPhotoLibraryUsageDescription</key>
+<string>We need access to your photo library to scan QR codes from images</string>
+
+<!-- App Transport Security (for development) -->
+<key>NSAppTransportSecurity</key>
+<dict>
+    <key>NSAllowsArbitraryLoads</key>
+    <true/>
+</dict>
+
+<!-- Supported Interface Orientations -->
+<key>UISupportedInterfaceOrientations</key>
+<array>
+    <string>UIInterfaceOrientationPortrait</string>
+    <string>UIInterfaceOrientationLandscapeLeft</string>
+    <string>UIInterfaceOrientationLandscapeRight</string>
+</array>
+
+<key>UISupportedInterfaceOrientations~ipad</key>
+<array>
+    <string>UIInterfaceOrientationPortrait</string>
+    <string>UIInterfaceOrientationPortraitUpsideDown</string>
+    <string>UIInterfaceOrientationLandscapeLeft</string>
+    <string>UIInterfaceOrientationLandscapeRight</string>
+</array>

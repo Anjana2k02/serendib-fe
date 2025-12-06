@@ -1,0 +1,49 @@
+name: serendib
+description: A Flutter mobile application with brown and off-white theme
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management
+  provider: ^6.1.1
+
+  # Local Storage
+  shared_preferences: ^2.2.2
+
+  # Secure Storage for tokens
+  flutter_secure_storage: ^9.0.0
+
+  # HTTP requests (for future API integration)
+  http: ^1.1.0
+
+  # QR Code functionality (temporarily disabled)
+  # qr_code_scanner: ^1.0.1
+  # qr_flutter: ^4.1.0
+
+  # Icons
+  cupertino_icons: ^1.0.2
+
+  # Permissions
+  permission_handler: ^11.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Add custom fonts here if needed
+  # fonts:
+  #   - family: CustomFont
+  #     fonts:
+  #       - asset: fonts/CustomFont-Regular.ttf
+  #       - asset: fonts/CustomFont-Bold.ttf
+  #         weight: 700
