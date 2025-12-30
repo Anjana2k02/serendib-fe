@@ -52,7 +52,7 @@ class AppConstants {
   // Use your computer's IP address for physical device testing
   // For emulator, use 'http://10.0.2.2:8080'
   // For physical device, use your computer's local IP address
-  static const String baseUrl = 'http://192.168.1.7:8080';
+  static const String baseUrl = 'http://10.138.45.13:8080';
   static const String apiVersion = '/api/v1';
   static const String apiBaseUrl = '$baseUrl$apiVersion';
 
