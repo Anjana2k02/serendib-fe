@@ -75,10 +75,10 @@ class HomeContentScreen extends StatelessWidget {
                   route: '/ai-assistant',
                 ),
                 _FeatureCard(
-                  icon: Icons.navigation,
-                  title: 'Navigation',
+                  icon: Icons.map,
+                  title: 'Indoor Map',
                   color: AppColors.primaryBrown,
-                  route: '/navigation',
+                  route: '/indoor-map',
                 ),
                 _FeatureCard(
                   icon: Icons.translate,
