@@ -129,7 +129,7 @@ class SerendibApp extends StatelessWidget {
     }
   }
 }
-
+// dkbjw kjbefef
 class _SplashScreen extends StatefulWidget {
   const _SplashScreen();
 
