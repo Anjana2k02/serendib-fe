@@ -18,10 +18,15 @@ import 'screens/features/ar_vr_screen.dart';
 import 'screens/features/feedback_screen.dart';
 import 'screens/features/contact_screen.dart';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import 'screens/features/ai_assistant_screen.dart';
 =======
 import 'screens/features/indoor_map_screen.dart';
 >>>>>>> 505a37a58330321349a352d64f19bb9bf1216aff
+=======
+import 'screens/features/ai_assistant_screen.dart';
+import 'screens/features/indoor_map_screen.dart';
+>>>>>>> 86d24f3ea2b78182ae6e01fa93920f98ada864ef
 import 'screens/artifacts/artifacts_list_screen.dart';
 
 void main() async {
@@ -132,7 +137,7 @@ class SerendibApp extends StatelessWidget {
     }
   }
 }
-
+// dkbjw kjbefef
 class _SplashScreen extends StatefulWidget {
   const _SplashScreen();
 
