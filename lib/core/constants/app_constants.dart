@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 /// App-wide constants
@@ -49,17 +51,38 @@ class AppConstants {
   static const String userDataKey = 'user_data';
 
   // API Configuration
-  // Use your computer's IP address for physical device testing
-  // For emulator, use 'http://10.0.2.2:8080'
-  // For physical device, use your computer's local IP address
-  static const String baseUrl = 'http://10.138.45.13:8080';
+  // Automatically selects the correct backend URL based on platform
+  static String get baseUrl {
+    if (kIsWeb) {
+      // For web/Chrome, use localhost
+      return 'http://localhost:8080';
+    } else {
+      // For Android/iOS
+      try {
+        if (Platform.isAndroid) {
+          // Android emulator special IP to access host machine
+          return 'http://10.0.2.2:8080';
+        } else if (Platform.isIOS) {
+          // iOS simulator can use localhost
+          return 'http://localhost:8080';
+        } else {
+          // Physical devices - use your computer's IP
+          return 'http://10.138.45.13:8080';
+        }
+      } catch (e) {
+        // Fallback for physical devices
+        return 'http://10.138.45.13:8080';
+      }
+    }
+  }
+
   static const String apiVersion = '/api/v1';
-  static const String apiBaseUrl = '$baseUrl$apiVersion';
+  static String get apiBaseUrl => '$baseUrl$apiVersion';
 
   // API Endpoints
-  static const String loginEndpoint = '$apiBaseUrl/auth/login';
-  static const String registerEndpoint = '$apiBaseUrl/auth/register';
-  static const String artifactsEndpoint = '$apiBaseUrl/artifacts';
+  static String get loginEndpoint => '$apiBaseUrl/auth/login';
+  static String get registerEndpoint => '$apiBaseUrl/auth/register';
+  static String get artifactsEndpoint => '$apiBaseUrl/artifacts';
 
   // HTTP Headers
   static const String contentTypeJson = 'application/json';

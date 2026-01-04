@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG Coordinate Finder - Museum Map</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #FAF7F2;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #6B4423;
+            margin-bottom: 10px;
+        }
+        .info {
+            background: #E8DCC8;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border-left: 4px solid #D4AF37;
+        }
+        #svgContainer {
+            position: relative;
+            border: 2px solid #6B4423;
+            background: white;
+            cursor: crosshair;
+            margin: 20px 0;
+        }
+        #coordinates {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #6B4423;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            min-width: 250px;
+            font-family: 'Courier New', monospace;
+        }
+        .coord-label {
+            color: #D4AF37;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .coord-value {
+            font-size: 24px;
+            margin: 5px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+        #markers {
+            margin-top: 20px;
+        }
+        .marker-item {
+            background: #F0E9DC;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            background: #D4AF37;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background: #B8941F;
+        }
+        .btn-danger {
+            background: #B83232;
+        }
+        .btn-danger:hover {
+            background: #961414;
+        }
+        #jsonOutput {
+            background: #2C1810;
+            color: #D4AF37;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            max-height: 400px;
+            margin-top: 20px;
+        }
+        .grid-toggle {
+            margin: 10px 0;
+        }
+        .grid-overlay {
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗺️ SVG Coordinate Finder for Museum Map</h1>
+
+        <div class="info">
+            <strong>Instructions:</strong>
+            <ol>
+                <li>Move your mouse over the map to see coordinates</li>
+                <li>Click anywhere to add a marker at that position</li>
+                <li>Toggle grid to help visualize the 6×4 layout</li>
+                <li>Copy the JSON output to use in your pois.json file</li>
+            </ol>
+        </div>
+
+        <div class="grid-toggle">
+            <label>
+                <input type="checkbox" id="gridToggle" checked> Show Grid Lines
+            </label>
+            <label style="margin-left: 20px;">
+                <input type="checkbox" id="pedestalToggle" checked> Show Pedestals
+            </label>
+        </div>
+
+        <div id="svgContainer"></div>
+
+        <div id="coordinates">
+            <div class="coord-label">Current Position:</div>
+            <div class="coord-value">X: <span id="xCoord">0</span></div>
+            <div class="coord-value">Y: <span id="yCoord">0</span></div>
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.2);">
+                <div class="coord-label">Click to Add Marker</div>
+                <div style="font-size: 12px; margin-top: 5px; opacity: 0.8;">
+                    Markers: <span id="markerCount">0</span>
+                </div>
+            </div>
+            <button class="btn" onclick="clearMarkers()" style="margin-top: 10px; width: 100%;">
+                Clear All Markers
+            </button>
+        </div>
+
+        <div id="markers"></div>
+
+        <h3 style="color: #6B4423; margin-top: 30px;">JSON Output (Copy this to pois.json):</h3>
+        <pre id="jsonOutput">Click on the map to add artifact positions...</pre>
+    </div>
+
+    <script>
+        // Load and display the SVG map
+        fetch('assets/maps/museum_floor_plan.svg')
+            .then(response => response.text())
+            .then(svgContent => {
+                const container = document.getElementById('svgContainer');
+                container.innerHTML = svgContent;
+
+                const svg = container.querySelector('svg');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.display = 'block';
+
+                // Add grid overlay
+                addGridOverlay(svg);
+
+                // Track mouse movement
+                svg.addEventListener('mousemove', (e) => {
+                    const rect = svg.getBoundingClientRect();
+                    const x = Math.round((e.clientX - rect.left) / rect.width * 1000);
+                    const y = Math.round((e.clientY - rect.top) / rect.height * 800);
+
+                    document.getElementById('xCoord').textContent = x;
+                    document.getElementById('yCoord').textContent = y;
+                });
+
+                // Add markers on click
+                svg.addEventListener('click', (e) => {
+                    const rect = svg.getBoundingClientRect();
+                    const x = Math.round((e.clientX - rect.left) / rect.width * 1000);
+                    const y = Math.round((e.clientY - rect.top) / rect.height * 800);
+
+                    addMarker(x, y, svg);
+                });
+            });
+
+        let markers = [];
+        let markerIdCounter = 1;
+
+        function addGridOverlay(svg) {
+            const gridGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            gridGroup.id = 'gridOverlay';
+            gridGroup.classList.add('grid-overlay');
+
+            // Vertical lines at artifact X positions
+            const xPositions = [150, 300, 450, 600, 750, 900];
+            xPositions.forEach(x => {
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', x);
+                line.setAttribute('y1', 100);
+                line.setAttribute('x2', x);
+                line.setAttribute('y2', 650);
+                line.setAttribute('stroke', '#D4AF37');
+                line.setAttribute('stroke-width', '1');
+                line.setAttribute('stroke-dasharray', '5,5');
+                line.setAttribute('opacity', '0.5');
+                gridGroup.appendChild(line);
+            });
+
+            // Horizontal lines at artifact Y positions
+            const yPositions = [150, 300, 450, 600];
+            yPositions.forEach(y => {
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', 100);
+                line.setAttribute('y1', y);
+                line.setAttribute('x2', 950);
+                line.setAttribute('y2', y);
+                line.setAttribute('stroke', '#D4AF37');
+                line.setAttribute('stroke-width', '1');
+                line.setAttribute('stroke-dasharray', '5,5');
+                line.setAttribute('opacity', '0.5');
+                gridGroup.appendChild(line);
+            });
+
+            svg.appendChild(gridGroup);
+
+            // Add pedestals
+            const pedestalGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            pedestalGroup.id = 'pedestalOverlay';
+            pedestalGroup.classList.add('grid-overlay');
+
+            xPositions.forEach(x => {
+                yPositions.forEach(y => {
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', x);
+                    circle.setAttribute('cy', y);
+                    circle.setAttribute('r', '25');
+                    circle.setAttribute('fill', 'none');
+                    circle.setAttribute('stroke', '#D4AF37');
+                    circle.setAttribute('stroke-width', '2');
+                    circle.setAttribute('opacity', '0.3');
+                    pedestalGroup.appendChild(circle);
+                });
+            });
+
+            svg.appendChild(pedestalGroup);
+
+            // Grid toggle
+            document.getElementById('gridToggle').addEventListener('change', (e) => {
+                gridGroup.style.display = e.target.checked ? 'block' : 'none';
+            });
+
+            document.getElementById('pedestalToggle').addEventListener('change', (e) => {
+                pedestalGroup.style.display = e.target.checked ? 'block' : 'none';
+            });
+        }
+
+        function addMarker(x, y, svg) {
+            const marker = {
+                id: `artifact_${String(markerIdCounter).padStart(2, '0')}`,
+                name: `Artifact ${markerIdCounter}`,
+                x: x,
+                y: y
+            };
+            markers.push(marker);
+            markerIdCounter++;
+
+            // Add visual marker to SVG
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', x);
+            circle.setAttribute('cy', y);
+            circle.setAttribute('r', '8');
+            circle.setAttribute('fill', '#D4AF37');
+            circle.setAttribute('stroke', '#6B4423');
+            circle.setAttribute('stroke-width', '2');
+            circle.id = `marker_${marker.id}`;
+            svg.appendChild(circle);
+
+            updateMarkerList();
+            updateJSONOutput();
+            document.getElementById('markerCount').textContent = markers.length;
+        }
+
+        function removeMarker(id) {
+            markers = markers.filter(m => m.id !== id);
+            const markerElement = document.getElementById(`marker_${id}`);
+            if (markerElement) markerElement.remove();
+            updateMarkerList();
+            updateJSONOutput();
+            document.getElementById('markerCount').textContent = markers.length;
+        }
+
+        function clearMarkers() {
+            markers.forEach(m => {
+                const markerElement = document.getElementById(`marker_${m.id}`);
+                if (markerElement) markerElement.remove();
+            });
+            markers = [];
+            markerIdCounter = 1;
+            updateMarkerList();
+            updateJSONOutput();
+            document.getElementById('markerCount').textContent = 0;
+        }
+
+        function updateMarkerList() {
+            const markerList = document.getElementById('markers');
+            markerList.innerHTML = '<h3 style="color: #6B4423;">Marked Positions:</h3>';
+
+            markers.forEach(marker => {
+                const div = document.createElement('div');
+                div.className = 'marker-item';
+                div.innerHTML = `
+                    <span><strong>${marker.name}</strong> - (${marker.x}, ${marker.y})</span>
+                    <button class="btn btn-danger" onclick="removeMarker('${marker.id}')">Remove</button>
+                `;
+                markerList.appendChild(div);
+            });
+        }
+
+        function updateJSONOutput() {
+            if (markers.length === 0) {
+                document.getElementById('jsonOutput').textContent = 'Click on the map to add artifact positions...';
+                return;
+            }
+
+            const poisArray = markers.map((marker, index) => {
+                return {
+                    id: marker.id,
+                    name: marker.name,
+                    category: "artifact",
+                    position: { x: marker.x, y: marker.y },
+                    description: "Add your description here",
+                    tags: ["tag1", "tag2"],
+                    imagePath: null,
+                    iconPath: "assets/artifacts/your_icon.svg",
+                    artifactId: String(index + 1),
+                    connectedPOIs: []
+                };
+            });
+
+            const output = {
+                svgViewBox: { width: 1000, height: 800 },
+                pois: poisArray
+            };
+
+            document.getElementById('jsonOutput').textContent = JSON.stringify(output, null, 2);
+        }
+    </script>
+</body>
+</html>

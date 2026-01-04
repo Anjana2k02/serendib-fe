@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" version="1.1" id="svg3168" width="682.66669" height="682.66669" viewBox="0 0 682.66669 682.66669">
+  <defs id="defs3172">
+    <clipPath clipPathUnits="userSpaceOnUse" id="clipPath3182">
+      <path d="M 0,512 H 512 V 0 H 0 Z" id="path3180"/>
+    </clipPath>
+  </defs>
+  <mask id="custom"><rect id="bg" x="0" y="0" width="100%" height="100%" fill="white"/><g transform="matrix(1.3333333,0,0,-1.3333333,0,682.66667)"/></mask><g mask="url(#custom)"><g id="g3174" transform="matrix(1.3333333,0,0,-1.3333333,0,682.66667)">
+    <g id="g3176">
+      <g id="g3178" clip-path="url(#clipPath3182)">
+        <g id="g3184" transform="translate(416,248.2578)">
+          <path d="m 0,0 c 0,-85.512 -71.638,-154.838 -160,-154.838 -88.363,0 -160,69.326 -160,154.838 0,63.381 39.35,117.863 95.701,141.822 14.475,-10.839 33.909,-15.463 53.483,-10.292 l 60.043,15.846 C -46.496,127.277 0,68.893 0,0 Z" style="fill:none;stroke:#000000;stroke-width:30;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" id="path3186"/>
+        </g>
+        <g id="g3188" transform="translate(325.0342,470.7617)">
+          <path d="m 0,0 c 98.892,-28.697 170.966,-117.461 170.966,-222.504 0,-128.267 -107.456,-232.258 -240,-232.258 -132.544,0 -240,103.991 -240,232.258 0,101.441 67.211,187.695 160.886,219.345 10.879,17.228 30.548,28.397 52.106,28.397 5.312,0 10.752,-0.681 16.191,-2.116 L -11.903,5.191 C -7.595,4.057 -3.595,2.291 0,0 c 11.595,-7.329 18.966,-19.965 18.966,-33.931 0,-18.281 -12.64,-34.301 -30.869,-39.112 l -7.905,-2.085 -60.043,-15.846 c -19.573,-5.171 -39.007,-0.547 -53.482,10.292" style="fill:none;stroke:#000000;stroke-width:30;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" id="path3190"/>
+        </g>
+        <g id="g3192" transform="translate(241,451)">
+          <path d="M 0,0 V 45" style="fill:none;stroke:#000000;stroke-width:30;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" id="path3194"/>
+        </g>
+        <g id="g3196" transform="translate(241,376)">
+          <path d="M 0,0 V 45" style="fill:none;stroke:#000000;stroke-width:30;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" id="path3198"/>
+        </g>
+      </g>
+    </g>
+  </g></g>
+</svg>

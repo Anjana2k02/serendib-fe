@@ -69,10 +69,10 @@ class HomeContentScreen extends StatelessWidget {
               childAspectRatio: 1.0,
               children: const [
                 _FeatureCard(
-                  icon: Icons.navigation,
-                  title: 'Navigation',
+                  icon: Icons.map,
+                  title: 'Indoor Map',
                   color: AppColors.primaryBrown,
-                  route: '/navigation',
+                  route: '/indoor-map',
                 ),
                 _FeatureCard(
                   icon: Icons.translate,
