@@ -7,6 +7,7 @@ import 'providers/auth_provider.dart';
 import 'providers/artifact_provider.dart';
 import 'services/storage_service.dart';
 import 'screens/onboarding/onboarding_screen.dart';
+import 'screens/auth/welcome_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/home/home_screen.dart';
@@ -16,7 +17,11 @@ import 'screens/features/qr_scanner_screen.dart';
 import 'screens/features/ar_vr_screen.dart';
 import 'screens/features/feedback_screen.dart';
 import 'screens/features/contact_screen.dart';
+<<<<<<< HEAD
 import 'screens/features/ai_assistant_screen.dart';
+=======
+import 'screens/features/indoor_map_screen.dart';
+>>>>>>> 505a37a58330321349a352d64f19bb9bf1216aff
 import 'screens/artifacts/artifacts_list_screen.dart';
 
 void main() async {
@@ -59,6 +64,10 @@ class SerendibApp extends StatelessWidget {
       case '/':
         return MaterialPageRoute(
           builder: (_) => const _SplashScreen(),
+        );
+      case '/welcome':
+        return MaterialPageRoute(
+          builder: (_) => const WelcomeScreen(),
         );
       case '/onboarding':
         return MaterialPageRoute(
@@ -108,6 +117,10 @@ class SerendibApp extends StatelessWidget {
         return MaterialPageRoute(
           builder: (_) => const ArtifactsListScreen(),
         );
+      case '/indoor-map':
+        return MaterialPageRoute(
+          builder: (_) => const IndoorMapScreen(),
+        );
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
@@ -141,21 +154,15 @@ class _SplashScreenState extends State<_SplashScreen> {
 
     final storage = StorageService();
 
-    // Check onboarding status
-    final onboardingCompleted = await storage.isOnboardingCompleted();
-
-    if (!onboardingCompleted) {
-      Navigator.of(context).pushReplacementNamed('/onboarding');
-      return;
-    }
-
-    // Check authentication status
+    // Check authentication status first
     final isAuthenticated = await storage.isAuthenticated();
 
     if (isAuthenticated) {
+      // User is already logged in, go directly to home
       Navigator.of(context).pushReplacementNamed('/home');
     } else {
-      Navigator.of(context).pushReplacementNamed('/login');
+      // User is not logged in, show welcome screen
+      Navigator.of(context).pushReplacementNamed('/welcome');
     }
   }
 

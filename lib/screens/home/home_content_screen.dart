@@ -69,6 +69,7 @@ class HomeContentScreen extends StatelessWidget {
               childAspectRatio: 1.0,
               children: const [
                 _FeatureCard(
+<<<<<<< HEAD
                   icon: Icons.smart_toy,
                   title: 'AI Assistant',
                   color: AppColors.accentGold,
@@ -77,8 +78,12 @@ class HomeContentScreen extends StatelessWidget {
                 _FeatureCard(
                   icon: Icons.navigation,
                   title: 'Navigation',
+=======
+                  icon: Icons.map,
+                  title: 'Indoor Map',
+>>>>>>> 505a37a58330321349a352d64f19bb9bf1216aff
                   color: AppColors.primaryBrown,
-                  route: '/navigation',
+                  route: '/indoor-map',
                 ),
                 _FeatureCard(
                   icon: Icons.translate,
