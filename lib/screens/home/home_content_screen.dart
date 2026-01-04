@@ -69,27 +69,14 @@ class HomeContentScreen extends StatelessWidget {
               childAspectRatio: 1.0,
               children: const [
                 _FeatureCard(
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 86d24f3ea2b78182ae6e01fa93920f98ada864ef
                   icon: Icons.smart_toy,
                   title: 'AI Assistant',
                   color: AppColors.accentGold,
                   route: '/ai-assistant',
                 ),
                 _FeatureCard(
-<<<<<<< HEAD
-                  icon: Icons.navigation,
-                  title: 'Navigation',
-=======
                   icon: Icons.map,
                   title: 'Indoor Map',
->>>>>>> 505a37a58330321349a352d64f19bb9bf1216aff
-=======
-                  icon: Icons.map,
-                  title: 'Indoor Map',
->>>>>>> 86d24f3ea2b78182ae6e01fa93920f98ada864ef
                   color: AppColors.primaryBrown,
                   route: '/indoor-map',
                 ),
