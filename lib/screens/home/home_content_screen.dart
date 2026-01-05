@@ -69,6 +69,12 @@ class HomeContentScreen extends StatelessWidget {
               childAspectRatio: 1.0,
               children: const [
                 _FeatureCard(
+                  icon: Icons.smart_toy,
+                  title: 'AI Assistant',
+                  color: AppColors.accentGold,
+                  route: '/ai-assistant',
+                ),
+                _FeatureCard(
                   icon: Icons.map,
                   title: 'Indoor Map',
                   color: AppColors.primaryBrown,
@@ -89,19 +95,19 @@ class HomeContentScreen extends StatelessWidget {
                 _FeatureCard(
                   icon: Icons.view_in_ar,
                   title: 'AR/VR',
-                  color: AppColors.accentGold,
+                  color: AppColors.darkBrown,
                   route: '/ar-vr',
                 ),
                 _FeatureCard(
                   icon: Icons.feedback_outlined,
                   title: 'Feedback',
-                  color: AppColors.darkBrown,
+                  color: AppColors.veryLightBrown,
                   route: '/feedback',
                 ),
                 _FeatureCard(
                   icon: Icons.contact_mail_outlined,
                   title: 'Contact Us',
-                  color: AppColors.veryLightBrown,
+                  color: AppColors.mediumBrown,
                   route: '/contact',
                 ),
               ],
