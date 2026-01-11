@@ -1,4 +1,4 @@
-# 🏛️ Serendib – Smart Artifact Guide
+# 🏛️ SerendipGuide – Smart Artifact Guide
 
 Multilingual, Navigational, and AI-Enhanced Mobile Application for Colombo National Museum
 
