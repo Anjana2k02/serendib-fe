@@ -1,61 +1,109 @@
-# Serendib - Flutter Mobile Application
+# 🏛️ Serendib – Smart Artifact Guide
 
-A beautiful Flutter mobile application with a brown and off-white color theme, designed to showcase Sri Lankan tourism and culture.
+Multilingual, Navigational, and AI-Enhanced Mobile Application for Colombo National Museum
 
-## Features
+## Project Overview
 
-### 🎨 Design System
-- **Color Palette**: Brown and off-white tones creating a warm, elegant aesthetic
+Serendib is an AI powered smart museum mobile application developed to enhance visitor engagement, accessibility, and personalization at the Colombo National Museum. The system integrates Artificial Intelligence, Machine Learning, Natural Language Processing, Image Processing, and affective computing to address limitations found in traditional museum experiences.
+
+Museums typically rely on static information displays, manual navigation, and generic feedback mechanisms, which fail to adapt to diverse visitor needs. Serendib proposes a unified smart museum ecosystem that delivers interactive artifact exploration, multilingual support, intelligent navigation, personalized recommendations, personalized AI Assistant Chatbot, and emotion aware feedback through a single mobile platform.
+
+## Project Objectives
+
+### Main Objective
+
+To design and develop an AI driven Smart Museum Guide system that enhances visitor experience through personalization, multilingual interaction, intelligent navigation, and emotion based feedback analysis.
+
+### Specific Objectives
+
+- Provide personalized artifact recommendations based on user profiles and interaction history
+- Deliver real time multilingual artifact descriptions using museum specific vocabulary
+- Enable efficient indoor navigation using a 2D Cartesian coordinate based mapping system
+- Capture visitor emotions using facial and vocal cues for passive feedback collection
+- Integrate an AI Assistant Chatbot capable of multilingual, emotion aware interaction
+- Support inclusive access for diverse visitor demographics, including differently abled users
+
+## Problem Statement
+
+Despite the growing adoption of digital technologies in museums, many visitor experiences remain limited by static information displays, lack of interactivity, and generic content delivery. Museum information is often presented in fixed formats that do not adapt to individual visitor interests or learning styles, while language barriers significantly reduce understanding for both local and international audiences. Additionally, the absence of personalized guidance and intelligent indoor navigation makes it difficult for visitors to efficiently explore large museum spaces. Existing feedback mechanisms rely heavily on manual surveys and explicit user input, which are intrusive, time consuming, and ineffective in capturing visitors’ true emotional responses. As a result, museums lack reliable, real time insights into visitor satisfaction and engagement, limiting their ability to continuously improve services and exhibit design.
+
+## Proposed Solution
+
+To address these challenges, Serendib proposes a unified, AI-powered smart museum ecosystem that integrates personalization, multilingual interaction, intelligent navigation, and emotion aware feedback within a single mobile application. The system incorporates an AI-driven recommendation engine, interactive 2D and 3D artifact visualization, and a personalized AI Assistant Chatbot that serves as a virtual museum guide and primary interaction layer. Indoor navigation is enabled through a 2D Cartesian coordinate based spatial model derived from the museum floor plan, allowing efficient and adaptive route guidance. Visitor emotions are captured using facial and vocal expression recognition to collect passive, real time feedback, which is analyzed to generate actionable insights for museum staff. Together, these components form a scalable and inclusive solution that enhances visitor engagement, reduces accessibility barriers, and supports continuous improvement of museum experiences.
+
+## Design System
+
+- **Color Palette**: Brown and off white tones creating a warm, elegant aesthetic
 - **Custom Theme**: Complete Material Design 3 implementation
 - **Consistent UI**: Reusable components with standardized spacing and styling
 - **Responsive**: Adapts to different screen sizes
 
-### 🚀 Core Features
+## Core Features
 
-#### 1. Onboarding Experience
-- 5 interactive questions to personalize user experience
+### 1. Onboarding Experience
+- Interactive questions to personalize user experience
 - Shows only on first app launch
 - Smooth page transitions and progress tracking
 - Beautiful custom option cards
 
-#### 2. Authentication System
+### 2. Authentication System
 - Secure login and registration screens
-- JWT-ready authentication structure
+- JWT ready authentication structure
 - Form validation and error handling
 - Secure token storage using flutter_secure_storage
 - Mock authentication (ready for API integration)
 
-#### 3. Main Home Screen
+### 3. Main Home Screen
 - 6 feature cards in a grid layout:
   - Navigation
   - Translator
   - QR Scanner
-  - AR/VR
+  - Artifact Visualization
   - Feedback
-  - Contact Us
+  - Assistant Chatbot
 - Personalized welcome message
 - Quick tips section
 
-#### 4. Custom Bottom Navigation
+### 4. Custom Bottom Navigation
 - 5 navigation items
 - **Elevated center QR button** with special styling
 - Smooth transitions between screens
 - Active state indicators
 
-#### 5. Feature Screens
+### 5. Feature Screens
 - **Navigation**: GPS and map integration placeholder
 - **Translator**: Language translation interface with multiple language support
 - **QR Scanner**: QR code scanning functionality (camera permission ready)
-- **AR/VR**: Augmented and Virtual Reality experiences
+- **Artifact Visualization**: Uses AI inpainting to digitally restore broken/missing artifacts
 - **Feedback**: User feedback form with rating system
-- **Contact Us**: Complete contact information and social media links
+- **Assistant Chatbot**: Helps via QnA
 
-#### 6. Additional Screens
+### 6. Additional Screens
 - **Lists**: Saved places, favorites, recent visits
 - **Profile**: User profile management and settings
 - **Settings**: App preferences and configurations
 
-### 🛠 Technical Stack
+## Accessibility Support
+
+### Visual Impairment Support
+
+- Screen reader compatible UI
+- Audio based content via chatbot and narration
+- High contrast and readable interface
+
+### Hearing Impairment Support
+
+- Text based chatbot interaction
+- Visual explanations and artifact details
+- Non audio dependent navigation cues
+
+### Cognitive and Learning Difficulties Support
+
+- Simple, consistent interface design
+- Step by step guidance through chatbot
+- Visual learning via artifact visualization
+
+## Technical Stack
 
 - **Framework**: Flutter 3.0+
 - **State Management**: Provider
@@ -123,8 +171,8 @@ serendib/
 │   │   │   ├── login_screen.dart
 │   │   │   └── register_screen.dart
 │   │   ├── features/
-│   │   │   ├── ar_vr_screen.dart
-│   │   │   ├── contact_screen.dart
+│   │   │   ├── visualization_screen.dart
+│   │   │   ├── chatbot_screen.dart
 │   │   │   ├── feedback_screen.dart
 │   │   │   ├── list_screen.dart
 │   │   │   ├── navigation_screen.dart
@@ -226,17 +274,6 @@ static const String authTokenKey = 'auth_token';
 static const String userDataKey = 'user_data';
 ```
 
-## Features Ready for Integration
-
-The app includes placeholder screens ready for feature integration:
-
-- **Navigation**: Ready for Google Maps or Mapbox integration
-- **Translator**: Ready for translation API (Google Translate, etc.)
-- **QR Scanner**: Camera permission handling in place
-- **AR/VR**: Structure ready for AR Core/Kit integration
-- **Feedback**: Form ready for backend submission
-- **Contact**: Links ready for email, phone, and web integration
-
 ## Testing
 
 Run tests with:
@@ -262,28 +299,32 @@ flutter test
   <key>NSCameraUsageDescription</key>
   <string>We need camera access for QR scanning</string>
   ```
+## Expected Outcomes
 
-## Known Limitations
+- Improved visitor engagement and satisfaction
+- Reduced language and accessibility barriers
+- Personalized museum experiences
+- Emotion-driven insights for exhibit improvement
+- Data-driven decision support for museum management
 
-- **Mock Authentication**: Currently uses mock JWT tokens. Integrate with your backend API.
-- **QR Scanner**: Requires actual camera implementation
-- **AR/VR**: Placeholder only - requires AR Core/Kit integration
-- **Translation**: Needs translation API integration
-- **Maps**: Navigation screen needs map SDK integration
+## Project Limitations
+
+- Emotion recognition accuracy can vary due to lighting, noise, and cultural differences
+- Biometric data usage is limited by privacy and consent requirements
+- Performance depends on mobile device hardware capabilities
+- Real-time crowd detection for navigation is limited
+- Some features require stable internet connectivity
 
 ## Future Enhancements
 
-- [ ] Real API integration for authentication
-- [ ] Actual QR code scanning implementation
-- [ ] Google Maps / Mapbox integration
-- [ ] Translation API integration
-- [ ] AR/VR SDK integration
-- [ ] Push notifications
-- [ ] Offline mode with local database
+- [ ] Advanced AI-based recommendation refinement
+- [ ] Crowd-aware indoor navigation optimization
+- [ ] Offline mode for low-connectivity environment
+- [ ] Expansion to additional foreign languages
+- [ ] Integration with museum analytics dashboards
+- [ ] Explainable AI (XAI) for transparent recommendations
 - [ ] Dark mode support
-- [ ] Multilingual support (i18n)
-- [ ] Analytics integration
-- [ ] Crash reporting
+- [ ] Deployment across multiple museums
 
 ## Contributing
 
@@ -292,22 +333,8 @@ flutter test
 3. Test thoroughly
 4. Submit a pull request
 
-## License
-
-This project is licensed under the MIT License.
-
-## Support
-
-For issues or questions, please use the in-app feedback feature or contact:
-- Email: support@serendib.lk
-- Phone: +94 11 234 5678
-
 ## Acknowledgments
 
 - Designed with Flutter and Material Design 3
 - Color palette inspired by Sri Lankan earthy tones
 - Icons from Material Icons
-
----
-
-**Built with ❤️ using Flutter**
