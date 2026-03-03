@@ -17,6 +17,7 @@ import 'screens/features/qr_scanner_screen.dart';
 import 'screens/features/ar_vr_screen.dart';
 import 'screens/features/feedback_screen.dart';
 import 'screens/features/contact_screen.dart';
+import 'screens/features/ai_assistant_screen.dart';
 import 'screens/features/indoor_map_screen.dart';
 import 'screens/artifacts/artifacts_list_screen.dart';
 
@@ -96,6 +97,10 @@ class SerendibApp extends StatelessWidget {
       case '/ar-vr':
         return MaterialPageRoute(
           builder: (_) => const ARVRScreen(),
+        );
+      case '/ai-assistant':
+        return MaterialPageRoute(
+          builder: (_) => const AIAssistantScreen(),
         );
       case '/feedback':
         return MaterialPageRoute(
