@@ -41,6 +41,9 @@ dependencies:
   # Collection utilities for pathfinding
   collection: ^1.18.0
 
+  # Google Sign-In for OAuth2 authentication
+  google_sign_in: ^6.1.5
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -82,7 +82,13 @@ class AppConstants {
   // API Endpoints
   static String get loginEndpoint => '$apiBaseUrl/auth/login';
   static String get registerEndpoint => '$apiBaseUrl/auth/register';
+  static String get googleAuthEndpoint => '$apiBaseUrl/auth/google';
   static String get artifactsEndpoint => '$apiBaseUrl/artifacts';
+
+  // Google OAuth2
+  // Replace with your Web Client ID from Google Cloud Console / Firebase
+  static const String googleWebClientId =
+      'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com';
 
   // HTTP Headers
   static const String contentTypeJson = 'application/json';
