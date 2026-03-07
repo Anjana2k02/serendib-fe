@@ -44,6 +44,13 @@ dependencies:
   # Google Sign-In for OAuth2 authentication
   google_sign_in: ^6.1.5
 
+  # Image Picker for camera/gallery
+  image_picker: ^1.0.7
+
+  # 3d controller
+  flutter_3d_controller: ^2.3.0
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -56,6 +63,8 @@ flutter:
   assets:
     - assets/maps/
     - assets/artifacts/
+    - assets/artifacts/base_data/
+    - assets/artifacts/base_images/
 
   # Add custom fonts here if needed
   # fonts:
