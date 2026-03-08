@@ -38,8 +38,10 @@ class AppConstants {
   // Edge Insets
   static const EdgeInsets paddingAll = EdgeInsets.all(spacingMd);
   static const EdgeInsets paddingAllLg = EdgeInsets.all(spacingLg);
-  static const EdgeInsets paddingHorizontal = EdgeInsets.symmetric(horizontal: spacingMd);
-  static const EdgeInsets paddingVertical = EdgeInsets.symmetric(vertical: spacingMd);
+  static const EdgeInsets paddingHorizontal =
+      EdgeInsets.symmetric(horizontal: spacingMd);
+  static const EdgeInsets paddingVertical =
+      EdgeInsets.symmetric(vertical: spacingMd);
 
   // App Specific
   static const int onboardingQuestionCount = 5;
@@ -52,7 +54,7 @@ class AppConstants {
   // Use your computer's IP address for physical device testing
   // For emulator, use 'http://10.0.2.2:8080'
   // For physical device, use your computer's local IP address
-  static const String baseUrl = 'http://10.138.45.13:8080';
+  static const String baseUrl = 'http://192.168.1.170:8080';
   static const String apiVersion = '/api/v1';
   static const String apiBaseUrl = '$baseUrl$apiVersion';
 
@@ -60,6 +62,15 @@ class AppConstants {
   static const String loginEndpoint = '$apiBaseUrl/auth/login';
   static const String registerEndpoint = '$apiBaseUrl/auth/register';
   static const String artifactsEndpoint = '$apiBaseUrl/artifacts';
+  static const String feedbackEndpoint = '$apiBaseUrl/feedback';
+  static const String usersEndpoint = '$apiBaseUrl/users';
+
+  // FastAPI ML Backend
+  static const String mlBaseUrl = 'http://192.168.1.170:8000';
+  static const String predictEndpoint = '$mlBaseUrl/predict';
+  static const String translateEndpoint = '$mlBaseUrl/translate';
+  static const String artifactByIdEndpoint = '$mlBaseUrl/artifact';
+  static const String generateDescriptionEndpoint = '$mlBaseUrl/generate-description';
 
   // HTTP Headers
   static const String contentTypeJson = 'application/json';

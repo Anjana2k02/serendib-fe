@@ -17,6 +17,10 @@ import 'screens/features/ar_vr_screen.dart';
 import 'screens/features/feedback_screen.dart';
 import 'screens/features/contact_screen.dart';
 import 'screens/artifacts/artifacts_list_screen.dart';
+import 'screens/artifacts/artifact_detail_screen.dart';
+import 'screens/artifacts/artifact_form_screen.dart';
+import 'models/artifact.dart';
+import 'models/user.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -103,6 +107,16 @@ class SerendibApp extends StatelessWidget {
         return MaterialPageRoute(
           builder: (_) => const ArtifactsListScreen(),
         );
+      case '/artifacts/create':
+        final artifact = settings.arguments as Artifact?;
+        return MaterialPageRoute(
+          builder: (_) => ArtifactFormScreen(artifact: artifact),
+        );
+      case '/artifacts/detail':
+        final artifact = settings.arguments as Artifact?;
+        return MaterialPageRoute(
+          builder: (_) => ArtifactDetailScreen(artifact: artifact),
+        );
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
@@ -134,6 +148,15 @@ class _SplashScreenState extends State<_SplashScreen> {
 
     if (!mounted) return;
 
+    // TODO: Remove this bypass after testing - skip auth and go straight to home
+    final authProvider = context.read<AuthProvider>();
+    authProvider.updateUser(
+      User(id: 1, firstName: 'Test', lastName: 'User', email: 'test@test.com', role: 'USER'),
+    );
+    Navigator.of(context).pushReplacementNamed('/home');
+    return;
+
+    // ignore: dead_code
     final storage = StorageService();
 
     // Check onboarding status

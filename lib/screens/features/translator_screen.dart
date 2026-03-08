@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/constants/app_constants.dart';
+import '../../services/translation_service.dart';
 
 class TranslatorScreen extends StatefulWidget {
   const TranslatorScreen({super.key});
@@ -11,15 +12,60 @@ class TranslatorScreen extends StatefulWidget {
 
 class _TranslatorScreenState extends State<TranslatorScreen> {
   final _textController = TextEditingController();
+  final _translationService = TranslationService();
   String _selectedFromLanguage = 'English';
   String _selectedToLanguage = 'Sinhala';
+  String _translatedText = '';
+  bool _isLoading = false;
 
   final List<String> _languages = ['English', 'Sinhala', 'Tamil', 'Spanish', 'French'];
+
+  static const Map<String, String> _langCodes = {
+    'English': 'en',
+    'Sinhala': 'si',
+    'Tamil': 'ta',
+    'Spanish': 'es',
+    'French': 'fr',
+  };
 
   @override
   void dispose() {
     _textController.dispose();
     super.dispose();
+  }
+
+  Future<void> _translate() async {
+    final text = _textController.text.trim();
+    if (text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter text to translate')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final result = await _translationService.translate(
+        text,
+        _langCodes[_selectedFromLanguage]!,
+        _langCodes[_selectedToLanguage]!,
+      );
+      setState(() {
+        _translatedText = result;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Translation failed: ${e.toString()}'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -114,15 +160,15 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
 
             // Translate Button
             ElevatedButton.icon(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Translation API integration coming soon'),
-                  ),
-                );
-              },
-              icon: const Icon(Icons.translate),
-              label: const Text('Translate'),
+              onPressed: _isLoading ? null : _translate,
+              icon: _isLoading
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.translate),
+              label: Text(_isLoading ? 'Translating...' : 'Translate'),
             ),
 
             const SizedBox(height: AppConstants.spacingLg),
@@ -144,17 +190,24 @@ class _TranslatorScreenState extends State<TranslatorScreen> {
                         ),
                   ),
                   const SizedBox(height: AppConstants.spacingMd),
-                  const SizedBox(
+                  SizedBox(
                     height: 120,
-                    child: Center(
-                      child: Text(
-                        'Translation will appear here',
-                        style: TextStyle(
-                          color: AppColors.textTertiary,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ),
+                    child: _translatedText.isEmpty
+                        ? const Center(
+                            child: Text(
+                              'Translation will appear here',
+                              style: TextStyle(
+                                color: AppColors.textTertiary,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          )
+                        : SingleChildScrollView(
+                            child: SelectableText(
+                              _translatedText,
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                          ),
                   ),
                 ],
               ),

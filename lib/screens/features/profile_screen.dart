@@ -3,9 +3,235 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/constants/app_constants.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/user_service.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final _userService = UserService();
+
+  void _showEditProfileDialog() {
+    final user = context.read<AuthProvider>().user;
+    final firstNameController = TextEditingController(text: user?.firstName ?? '');
+    final lastNameController = TextEditingController(text: user?.lastName ?? '');
+    final formKey = GlobalKey<FormState>();
+    bool isLoading = false;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Edit Profile'),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: firstNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'First Name',
+                    prefixIcon: Icon(Icons.person_outline),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'First name is required';
+                    }
+                    if (value.trim().length < 2) {
+                      return 'At least 2 characters';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: AppConstants.spacingMd),
+                TextFormField(
+                  controller: lastNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Last Name',
+                    prefixIcon: Icon(Icons.person_outline),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Last name is required';
+                    }
+                    if (value.trim().length < 2) {
+                      return 'At least 2 characters';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: isLoading ? null : () => Navigator.of(dialogContext).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: isLoading
+                  ? null
+                  : () async {
+                      if (!(formKey.currentState?.validate() ?? false)) return;
+
+                      setDialogState(() => isLoading = true);
+
+                      try {
+                        await _userService.updateProfile(
+                          firstNameController.text.trim(),
+                          lastNameController.text.trim(),
+                        );
+
+                        if (mounted) {
+                          final updatedUser = this.context.read<AuthProvider>().user!.copyWith(
+                                firstName: firstNameController.text.trim(),
+                                lastName: lastNameController.text.trim(),
+                              );
+                          this.context.read<AuthProvider>().updateUser(updatedUser);
+
+                          Navigator.of(dialogContext).pop();
+                          ScaffoldMessenger.of(this.context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Profile updated successfully'),
+                              backgroundColor: AppColors.success,
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        setDialogState(() => isLoading = false);
+                        if (mounted) {
+                          ScaffoldMessenger.of(this.context).showSnackBar(
+                            SnackBar(
+                              content: Text('Failed to update: ${e.toString()}'),
+                              backgroundColor: AppColors.error,
+                            ),
+                          );
+                        }
+                      }
+                    },
+              child: isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Save'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showChangePasswordDialog() {
+    final currentPasswordController = TextEditingController();
+    final newPasswordController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    bool isLoading = false;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Change Password'),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: currentPasswordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Current Password',
+                    prefixIcon: Icon(Icons.lock_outline),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Current password is required';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: AppConstants.spacingMd),
+                TextFormField(
+                  controller: newPasswordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'New Password',
+                    prefixIcon: Icon(Icons.lock_outline),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'New password is required';
+                    }
+                    if (value.length < 8) {
+                      return 'At least 8 characters';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: isLoading ? null : () => Navigator.of(dialogContext).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: isLoading
+                  ? null
+                  : () async {
+                      if (!(formKey.currentState?.validate() ?? false)) return;
+
+                      setDialogState(() => isLoading = true);
+
+                      try {
+                        await _userService.changePassword(
+                          currentPasswordController.text,
+                          newPasswordController.text,
+                        );
+
+                        if (mounted) {
+                          Navigator.of(dialogContext).pop();
+                          ScaffoldMessenger.of(this.context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Password changed successfully'),
+                              backgroundColor: AppColors.success,
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        setDialogState(() => isLoading = false);
+                        if (mounted) {
+                          ScaffoldMessenger.of(this.context).showSnackBar(
+                            SnackBar(
+                              content: Text('Failed: ${e.toString()}'),
+                              backgroundColor: AppColors.error,
+                            ),
+                          );
+                        }
+                      }
+                    },
+              child: isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Change'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,20 +286,12 @@ class ProfileScreen extends StatelessWidget {
             _ProfileOption(
               icon: Icons.person_outline,
               title: 'Edit Profile',
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Edit profile coming soon')),
-                );
-              },
+              onTap: _showEditProfileDialog,
             ),
             _ProfileOption(
               icon: Icons.security,
               title: 'Privacy & Security',
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Privacy settings coming soon')),
-                );
-              },
+              onTap: _showChangePasswordDialog,
             ),
             _ProfileOption(
               icon: Icons.notifications_outlined,
