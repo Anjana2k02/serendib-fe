@@ -21,16 +21,25 @@ dependencies:
 
   # HTTP requests (for future API integration)
   http: ^1.1.0
+  http_parser: ^4.0.0
 
-  # QR Code functionality (temporarily disabled)
-  # qr_code_scanner: ^1.0.1
-  # qr_flutter: ^4.1.0
+  # QR Code Scanner
+  mobile_scanner: ^5.1.1
+
+  # Image Picker (for artifact classification)
+  image_picker: ^1.0.7
 
   # Icons
   cupertino_icons: ^1.0.2
 
   # Permissions
   permission_handler: ^11.1.0
+
+  # URL Launcher (for contact screen)
+  url_launcher: ^6.2.4
+
+  # Audio Playback (for artifact audio)
+  audioplayers: ^6.0.0
 
   # SVG rendering for indoor maps
   flutter_svg: ^2.0.10
@@ -44,8 +53,8 @@ dependencies:
   # Google Sign-In for OAuth2 authentication
   google_sign_in: ^6.1.5
 
-  # Image Picker for camera/gallery
-  image_picker: ^1.0.7
+  # Firebase Core (required by generated firebase_options.dart)
+  firebase_core: ^3.15.2
 
   # 3d controller
   flutter_3d_controller: ^2.3.0

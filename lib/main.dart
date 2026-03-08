@@ -20,6 +20,9 @@ import 'screens/features/contact_screen.dart';
 import 'screens/features/ai_assistant_screen.dart';
 import 'screens/features/indoor_map_screen.dart';
 import 'screens/artifacts/artifacts_list_screen.dart';
+import 'screens/artifacts/artifact_detail_screen.dart';
+import 'screens/artifacts/artifact_form_screen.dart';
+import 'models/artifact.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -113,6 +116,16 @@ class SerendibApp extends StatelessWidget {
       case '/artifacts':
         return MaterialPageRoute(
           builder: (_) => const ArtifactsListScreen(),
+        );
+      case '/artifacts/create':
+        final artifact = settings.arguments as Artifact?;
+        return MaterialPageRoute(
+          builder: (_) => ArtifactFormScreen(artifact: artifact),
+        );
+      case '/artifacts/detail':
+        final artifact = settings.arguments as Artifact?;
+        return MaterialPageRoute(
+          builder: (_) => ArtifactDetailScreen(artifact: artifact),
         );
       case '/indoor-map':
         return MaterialPageRoute(
