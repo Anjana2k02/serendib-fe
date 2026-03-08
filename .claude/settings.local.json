@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(ipconfig:*)"
+      "Bash(ipconfig:*)",
+      "Bash(flutter pub get:*)",
+      "Bash(cat:*)"
     ]
   }
 }

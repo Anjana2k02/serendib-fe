@@ -7,6 +7,7 @@ import 'providers/auth_provider.dart';
 import 'providers/artifact_provider.dart';
 import 'services/storage_service.dart';
 import 'screens/onboarding/onboarding_screen.dart';
+import 'screens/auth/welcome_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/home/home_screen.dart';
@@ -16,11 +17,12 @@ import 'screens/features/qr_scanner_screen.dart';
 import 'screens/features/ar_vr_screen.dart';
 import 'screens/features/feedback_screen.dart';
 import 'screens/features/contact_screen.dart';
+import 'screens/features/ai_assistant_screen.dart';
+import 'screens/features/indoor_map_screen.dart';
 import 'screens/artifacts/artifacts_list_screen.dart';
 import 'screens/artifacts/artifact_detail_screen.dart';
 import 'screens/artifacts/artifact_form_screen.dart';
 import 'models/artifact.dart';
-import 'models/user.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -63,6 +65,10 @@ class SerendibApp extends StatelessWidget {
         return MaterialPageRoute(
           builder: (_) => const _SplashScreen(),
         );
+      case '/welcome':
+        return MaterialPageRoute(
+          builder: (_) => const WelcomeScreen(),
+        );
       case '/onboarding':
         return MaterialPageRoute(
           builder: (_) => const OnboardingScreen(),
@@ -95,6 +101,10 @@ class SerendibApp extends StatelessWidget {
         return MaterialPageRoute(
           builder: (_) => const ARVRScreen(),
         );
+      case '/ai-assistant':
+        return MaterialPageRoute(
+          builder: (_) => const AIAssistantScreen(),
+        );
       case '/feedback':
         return MaterialPageRoute(
           builder: (_) => const FeedbackScreen(),
@@ -116,6 +126,10 @@ class SerendibApp extends StatelessWidget {
         final artifact = settings.arguments as Artifact?;
         return MaterialPageRoute(
           builder: (_) => ArtifactDetailScreen(artifact: artifact),
+        );
+      case '/indoor-map':
+        return MaterialPageRoute(
+          builder: (_) => const IndoorMapScreen(),
         );
       default:
         return MaterialPageRoute(
@@ -148,32 +162,17 @@ class _SplashScreenState extends State<_SplashScreen> {
 
     if (!mounted) return;
 
-    // TODO: Remove this bypass after testing - skip auth and go straight to home
-    final authProvider = context.read<AuthProvider>();
-    authProvider.updateUser(
-      User(id: 1, firstName: 'Test', lastName: 'User', email: 'test@test.com', role: 'USER'),
-    );
-    Navigator.of(context).pushReplacementNamed('/home');
-    return;
-
-    // ignore: dead_code
     final storage = StorageService();
 
-    // Check onboarding status
-    final onboardingCompleted = await storage.isOnboardingCompleted();
-
-    if (!onboardingCompleted) {
-      Navigator.of(context).pushReplacementNamed('/onboarding');
-      return;
-    }
-
-    // Check authentication status
+    // Check authentication status first
     final isAuthenticated = await storage.isAuthenticated();
 
     if (isAuthenticated) {
+      // User is already logged in, go directly to home
       Navigator.of(context).pushReplacementNamed('/home');
     } else {
-      Navigator.of(context).pushReplacementNamed('/login');
+      // User is not logged in, show welcome screen
+      Navigator.of(context).pushReplacementNamed('/welcome');
     }
   }
 

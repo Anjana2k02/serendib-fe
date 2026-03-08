@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 800">
+  <!-- Background -->
+  <rect width="1000" height="800" fill="#FAF7F2"/>
+
+  <!-- Museum Building Outline -->
+  <rect x="50" y="50" width="900" height="700" fill="#FFFFFF" stroke="#6B4423" stroke-width="3" opacity="0.3"/>
+
+  <!-- Grid Lines - Subtle guides -->
+  <g stroke="#D4C7B8" stroke-width="1" opacity="0.2" stroke-dasharray="5,5">
+    <!-- Vertical lines -->
+    <line x1="150" y1="100" x2="150" y2="650"/>
+    <line x1="300" y1="100" x2="300" y2="650"/>
+    <line x1="450" y1="100" x2="450" y2="650"/>
+    <line x1="600" y1="100" x2="600" y2="650"/>
+    <line x1="750" y1="100" x2="750" y2="650"/>
+    <line x1="900" y1="100" x2="900" y2="650"/>
+
+    <!-- Horizontal lines -->
+    <line x1="100" y1="150" x2="950" y2="150"/>
+    <line x1="100" y1="300" x2="950" y2="300"/>
+    <line x1="100" y1="450" x2="950" y2="450"/>
+    <line x1="100" y1="600" x2="950" y2="600"/>
+  </g>
+
+  <!-- Exhibition Sections -->
+  <!-- Section 1: Ancient Egypt (Row 1) -->
+  <rect x="100" y="100" width="400" height="100" fill="#E8DCC8" stroke="#6B4423" stroke-width="2" rx="8" opacity="0.4"/>
+  <text x="300" y="140" font-family="Arial" font-size="16" fill="#6B4423" text-anchor="middle" font-weight="bold">Ancient Egypt Gallery</text>
+
+  <!-- Section 2: Greek & Roman (Row 1 right side) -->
+  <rect x="550" y="100" width="400" height="100" fill="#E8DCC8" stroke="#6B4423" stroke-width="2" rx="8" opacity="0.4"/>
+  <text x="750" y="140" font-family="Arial" font-size="16" fill="#6B4423" text-anchor="middle" font-weight="bold">Greek & Roman Hall</text>
+
+  <!-- Section 3: Ancient Artifacts (Row 2) -->
+  <rect x="100" y="250" width="400" height="100" fill="#F0E9DC" stroke="#6B4423" stroke-width="2" rx="8" opacity="0.4"/>
+  <text x="300" y="290" font-family="Arial" font-size="16" fill="#6B4423" text-anchor="middle" font-weight="bold">Ancient Artifacts</text>
+
+  <!-- Section 4: Medieval Collection (Row 2 right side) -->
+  <rect x="550" y="250" width="400" height="100" fill="#F0E9DC" stroke="#6B4423" stroke-width="2" rx="8" opacity="0.4"/>
+  <text x="750" y="290" font-family="Arial" font-size="16" fill="#6B4423" text-anchor="middle" font-weight="bold">Medieval Collection</text>
+
+  <!-- Section 5: World Treasures (Row 3) -->
+  <rect x="100" y="400" width="400" height="100" fill="#E8DCC8" stroke="#6B4423" stroke-width="2" rx="8" opacity="0.4"/>
+  <text x="300" y="440" font-family="Arial" font-size="16" fill="#6B4423" text-anchor="middle" font-weight="bold">World Treasures</text>
+
+  <!-- Section 6: Historical Monuments (Row 3 right side) -->
+  <rect x="550" y="400" width="400" height="100" fill="#E8DCC8" stroke="#6B4423" stroke-width="2" rx="8" opacity="0.4"/>
+  <text x="750" y="440" font-family="Arial" font-size="16" fill="#6B4423" text-anchor="middle" font-weight="bold">Historical Monuments</text>
+
+  <!-- Section 7: Ancient Architecture (Row 4) -->
+  <rect x="100" y="550" width="850" height="100" fill="#F0E9DC" stroke="#6B4423" stroke-width="2" rx="8" opacity="0.4"/>
+  <text x="525" y="590" font-family="Arial" font-size="16" fill="#6B4423" text-anchor="middle" font-weight="bold">Ancient Architecture & Natural History</text>
+
+  <!-- Main Entrance -->
+  <rect x="425" y="10" width="150" height="50" fill="#D4AF37" stroke="#6B4423" stroke-width="3" rx="4"/>
+  <text x="500" y="40" font-family="Arial" font-size="18" fill="#FFFFFF" text-anchor="middle" font-weight="bold">MUSEUM ENTRANCE</text>
+
+  <!-- Pathways - Main corridor -->
+  <line x1="500" y1="60" x2="500" y2="700" stroke="#C5B8A5" stroke-width="4" opacity="0.3"/>
+
+  <!-- Display Pedestals (subtle circles at artifact positions) -->
+  <g fill="#FFFFFF" stroke="#8B7C6F" stroke-width="1" opacity="0.3">
+    <!-- Row 1 -->
+    <circle cx="150" cy="150" r="25"/>
+    <circle cx="300" cy="150" r="25"/>
+    <circle cx="450" cy="150" r="25"/>
+    <circle cx="600" cy="150" r="25"/>
+    <circle cx="750" cy="150" r="25"/>
+    <circle cx="900" cy="150" r="25"/>
+
+    <!-- Row 2 -->
+    <circle cx="150" cy="300" r="25"/>
+    <circle cx="300" cy="300" r="25"/>
+    <circle cx="450" cy="300" r="25"/>
+    <circle cx="600" cy="300" r="25"/>
+    <circle cx="750" cy="300" r="25"/>
+    <circle cx="900" cy="300" r="25"/>
+
+    <!-- Row 3 -->
+    <circle cx="150" cy="450" r="25"/>
+    <circle cx="300" cy="450" r="25"/>
+    <circle cx="450" cy="450" r="25"/>
+    <circle cx="600" cy="450" r="25"/>
+    <circle cx="750" cy="450" r="25"/>
+    <circle cx="900" cy="450" r="25"/>
+
+    <!-- Row 4 -->
+    <circle cx="150" cy="600" r="25"/>
+    <circle cx="300" cy="600" r="25"/>
+    <circle cx="450" cy="600" r="25"/>
+    <circle cx="600" cy="600" r="25"/>
+    <circle cx="750" cy="600" r="25"/>
+    <circle cx="900" cy="600" r="25"/>
+  </g>
+
+  <!-- Information Sign -->
+  <rect x="850" y="720" width="120" height="60" fill="#6B4423" stroke="#4A2C1A" stroke-width="2" rx="4"/>
+  <text x="910" y="745" font-family="Arial" font-size="12" fill="#FFFFFF" text-anchor="middle">Museum Map</text>
+  <text x="910" y="765" font-family="Arial" font-size="10" fill="#D4AF37" text-anchor="middle">24 Artifacts</text>
+</svg>

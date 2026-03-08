@@ -32,14 +32,93 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   void _submitFeedback() {
     if (_formKey.currentState?.validate() ?? false) {
       // TODO: Send feedback to backend
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Thank you for your feedback!'),
-          backgroundColor: AppColors.success,
-        ),
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.success.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_circle,
+                    color: AppColors.success,
+                    size: 64,
+                  ),
+                ),
+                const SizedBox(height: AppConstants.spacingLg),
+                Text(
+                  'Thank You!',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryBrown,
+                      ),
+                ),
+                const SizedBox(height: AppConstants.spacingSm),
+                Text(
+                  'Your feedback has been submitted successfully. We appreciate you taking the time to help us improve!',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                ),
+              ],
+            ),
+            actions: [
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close dialog only
+                    _resetForm(); // Reset form for new feedback
+                  },
+                  child: const Text('Done'),
+                ),
+              ),
+            ],
+          );
+        },
       );
-      Navigator.of(context).pop();
     }
+  }
+
+  void _resetForm() {
+    setState(() {
+      _feedbackController.clear();
+      _selectedCategory = 'General';
+      _rating = 5;
+    });
+  }
+
+  // TODO: Implement facial feedback capture
+  void _startFacialFeedback() {
+    // Placeholder for facial emotion recognition
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Facial feedback coming soon!'),
+        backgroundColor: AppColors.info,
+      ),
+    );
+  }
+
+  // TODO: Implement vocal feedback capture
+  void _startVocalFeedback() {
+    // Placeholder for voice sentiment analysis
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Vocal feedback coming soon!'),
+        backgroundColor: AppColors.info,
+      ),
+    );
   }
 
   @override
@@ -96,6 +175,40 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
               const SizedBox(height: AppConstants.spacingXl),
 
+              // Advanced Feedback Options (Coming Soon)
+              Text(
+                'Express Your Feedback',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: AppConstants.spacingMd),
+              Row(
+                children: [
+                  // Facial Feedback Card
+                  Expanded(
+                    child: _buildAdvancedFeedbackCard(
+                      icon: Icons.face,
+                      title: 'Facial',
+                      subtitle: 'Coming Soon',
+                      onTap: _startFacialFeedback,
+                      isEnabled: false,
+                    ),
+                  ),
+                  const SizedBox(width: AppConstants.spacingMd),
+                  // Vocal Feedback Card
+                  Expanded(
+                    child: _buildAdvancedFeedbackCard(
+                      icon: Icons.mic,
+                      title: 'Vocal',
+                      subtitle: 'Coming Soon',
+                      onTap: _startVocalFeedback,
+                      isEnabled: false,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: AppConstants.spacingXl),
+
               // Category
               Text(
                 'Category',
@@ -103,7 +216,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               ),
               const SizedBox(height: AppConstants.spacingMd),
               DropdownButtonFormField<String>(
-                initialValue: _selectedCategory,
+                value: _selectedCategory,
                 decoration: const InputDecoration(
                   prefixIcon: Icon(Icons.category_outlined),
                 ),
@@ -158,6 +271,75 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAdvancedFeedbackCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+    bool isEnabled = true,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(AppConstants.spacingMd),
+        decoration: BoxDecoration(
+          color: isEnabled
+              ? AppColors.creamWhite
+              : AppColors.lightCream.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(AppConstants.radiusMd),
+          border: Border.all(
+            color: isEnabled ? AppColors.primaryBrown : AppColors.divider,
+            width: 1.5,
+          ),
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: isEnabled
+                    ? AppColors.primaryBrown.withOpacity(0.1)
+                    : AppColors.textTertiary.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: 32,
+                color:
+                    isEnabled ? AppColors.primaryBrown : AppColors.textTertiary,
+              ),
+            ),
+            const SizedBox(height: AppConstants.spacingSm),
+            Text(
+              title,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color:
+                    isEnabled ? AppColors.textPrimary : AppColors.textTertiary,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.accentGold.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 10,
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

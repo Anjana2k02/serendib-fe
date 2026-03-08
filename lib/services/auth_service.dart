@@ -5,6 +5,15 @@ import 'api_service.dart';
 class AuthService {
   final ApiService _apiService = ApiService();
 
+  Future<AuthResponse> loginWithGoogle(String idToken) async {
+    final response = await _apiService.post(
+      AppConstants.googleAuthEndpoint,
+      {'idToken': idToken},
+      requiresAuth: false,
+    );
+    return AuthResponse.fromJson(response);
+  }
+
   Future<AuthResponse> login(String email, String password) async {
     final body = {
       'email': email,
