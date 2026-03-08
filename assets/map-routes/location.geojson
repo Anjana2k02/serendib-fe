@@ -1,0 +1,25 @@
+{
+"type": "FeatureCollection",
+"name": "location",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "id": 1, "name": "entrance" }, "geometry": { "type": "Point", "coordinates": [ 547.002134146341405, -1140.821722560976013 ] } },
+{ "type": "Feature", "properties": { "id": 5, "name": "pottery" }, "geometry": { "type": "Point", "coordinates": [ 842.533070485196731, -997.388793945317047 ] } },
+{ "type": "Feature", "properties": { "id": 6, "name": "ancient masks" }, "geometry": { "type": "Point", "coordinates": [ 791.223123838853667, -775.443443335554207 ] } },
+{ "type": "Feature", "properties": { "id": 7, "name": "Ancient Wepons" }, "geometry": { "type": "Point", "coordinates": [ 661.158375363239998, -693.108877786771245 ] } },
+{ "type": "Feature", "properties": { "id": 1, "name": "Kandy Crown" }, "geometry": { "type": "Point", "coordinates": [ 743.492940912022846, -545.145310713595904 ] } },
+{ "type": "Feature", "properties": { "id": 2, "name": "Swords And Wepons" }, "geometry": { "type": "Point", "coordinates": [ 827.020761033976669, -625.093367116037484 ] } },
+{ "type": "Feature", "properties": { "id": 8, "name": "wepons" }, "geometry": { "type": "Point", "coordinates": [ 229.200219875421851, -248.024921994074646 ] } },
+{ "type": "Feature", "properties": { "id": 9, "name": "Art Gallery" }, "geometry": { "type": "Point", "coordinates": [ 506.431478658536662, -241.107774390244373 ] } },
+{ "type": "Feature", "properties": { "id": 11, "name": "pottery" }, "geometry": { "type": "Point", "coordinates": [ 704.511737804878067, -243.494283536585868 ] } },
+{ "type": "Feature", "properties": { "id": 12, "name": "Skulture" }, "geometry": { "type": "Point", "coordinates": [ 861.625143655928923, -248.024921994074646 ] } },
+{ "type": "Feature", "properties": { "id": 13, "name": "Coins" }, "geometry": { "type": "Point", "coordinates": [ 952.708689024390196, -412.936432926829752 ] } },
+{ "type": "Feature", "properties": { "id": 14, "name": "Exit" }, "geometry": { "type": "Point", "coordinates": [ 291.645655487804788, -577.605564024390674 ] } },
+{ "type": "Feature", "properties": { "id": 16, "name": "Statues" }, "geometry": { "type": "Point", "coordinates": [ 107.884451219512243, -386.684832317073642 ] } },
+{ "type": "Feature", "properties": { "id": 16, "name": "Old Wepons" }, "geometry": { "type": "Point", "coordinates": [ 105.497942073170748, -529.875381097561444 ] } },
+{ "type": "Feature", "properties": { "id": 17, "name": "Kandian Cloths" }, "geometry": { "type": "Point", "coordinates": [ 767.358032375438142, -430.592871689202184 ] } },
+{ "type": "Feature", "properties": { "id": 18, "name": "Rest Area" }, "geometry": { "type": "Point", "coordinates": [ 446.76875, -844.894588414634541 ] } },
+{ "type": "Feature", "properties": { "id": 20, "name": "Toilet" }, "geometry": { "type": "Point", "coordinates": [ 547.002134146341405, -596.697637195122411 ] } },
+{ "type": "Feature", "properties": { "id": 21, "name": "Outdoor Area" }, "geometry": { "type": "Point", "coordinates": [ 425.869650894833967, -548.194769656499034 ] } }
+]
+}
