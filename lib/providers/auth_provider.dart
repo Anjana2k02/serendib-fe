@@ -181,6 +181,12 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void updateUser(User updatedUser) {
+    _user = updatedUser;
+    _storageService.saveUser(updatedUser);
+    notifyListeners();
+  }
+
   void clearError() {
     _error = null;
     notifyListeners();

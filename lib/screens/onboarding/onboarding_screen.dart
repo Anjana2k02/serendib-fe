@@ -23,7 +23,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final Map<String, List<String>> _multiSelectResponses = {};
 
   // For country selection
-  bool _isForeignVisitor = false;
   bool _showCountryPage = false;
   Country? _selectedCountry;
   List<Country> _countries = [];
@@ -41,11 +40,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
       // Check if Q1 (visitor type) and Foreign Visitor selected
       if (questionId == 'q1' && option == 'Foreign Visitor') {
-        _isForeignVisitor = true;
         _showCountryPage = true;
         _loadCountries();
       } else if (questionId == 'q1') {
-        _isForeignVisitor = false;
         _showCountryPage = false;
       }
     });

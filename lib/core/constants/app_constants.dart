@@ -40,8 +40,10 @@ class AppConstants {
   // Edge Insets
   static const EdgeInsets paddingAll = EdgeInsets.all(spacingMd);
   static const EdgeInsets paddingAllLg = EdgeInsets.all(spacingLg);
-  static const EdgeInsets paddingHorizontal = EdgeInsets.symmetric(horizontal: spacingMd);
-  static const EdgeInsets paddingVertical = EdgeInsets.symmetric(vertical: spacingMd);
+  static const EdgeInsets paddingHorizontal =
+      EdgeInsets.symmetric(horizontal: spacingMd);
+  static const EdgeInsets paddingVertical =
+      EdgeInsets.symmetric(vertical: spacingMd);
 
   // App Specific
   static const int onboardingQuestionCount = 5;
@@ -75,7 +77,6 @@ class AppConstants {
       }
     }
   }
-
   static const String apiVersion = '/api/v1';
   static String get apiBaseUrl => '$baseUrl$apiVersion';
 
@@ -84,6 +85,16 @@ class AppConstants {
   static String get registerEndpoint => '$apiBaseUrl/auth/register';
   static String get googleAuthEndpoint => '$apiBaseUrl/auth/google';
   static String get artifactsEndpoint => '$apiBaseUrl/artifacts';
+  static String get feedbackEndpoint => '$apiBaseUrl/feedback';
+  static String get usersEndpoint => '$apiBaseUrl/users';
+
+  // FastAPI ML Backend
+  static const String mlBaseUrl = 'http://192.168.1.170:8000';
+  static const String predictEndpoint = '$mlBaseUrl/predict';
+  static const String translateEndpoint = '$mlBaseUrl/translate';
+  static const String artifactByIdEndpoint = '$mlBaseUrl/artifact';
+  static const String generateDescriptionEndpoint =
+      '$mlBaseUrl/generate-description';
 
   // Google OAuth2
   // Replace with your Web Client ID from Google Cloud Console / Firebase
