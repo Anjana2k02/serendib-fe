@@ -1,6 +1,5 @@
-import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:serendib/core/config/env_config.dart';
 
 /// App-wide constants
 class AppConstants {
@@ -53,30 +52,7 @@ class AppConstants {
   static const String userDataKey = 'user_data';
 
   // API Configuration
-  // Automatically selects the correct backend URL based on platform
-  static String get baseUrl {
-    if (kIsWeb) {
-      // For web/Chrome, use localhost
-      return 'http://localhost:8080';
-    } else {
-      // For Android/iOS
-      try {
-        if (Platform.isAndroid) {
-          // Android emulator special IP to access host machine
-          return 'http://10.0.2.2:8080';
-        } else if (Platform.isIOS) {
-          // iOS simulator can use localhost
-          return 'http://localhost:8080';
-        } else {
-          // Physical devices - use your computer's IP
-          return 'http://10.138.45.13:8080';
-        }
-      } catch (e) {
-        // Fallback for physical devices
-        return 'http://10.138.45.13:8080';
-      }
-    }
-  }
+  static String get baseUrl => EnvConfig.backendUrl;
   static const String apiVersion = '/api/v1';
   static String get apiBaseUrl => '$baseUrl$apiVersion';
 
