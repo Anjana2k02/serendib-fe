@@ -71,6 +71,7 @@ flutter:
   # Assets
   assets:
     - assets/maps/
+    - assets/map-routes/
     - assets/artifacts/
     - assets/artifacts/base_data/
     - assets/artifacts/base_images/
