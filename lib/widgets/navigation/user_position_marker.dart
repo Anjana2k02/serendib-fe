@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../models/map_position.dart';
-import '../../core/theme/app_colors.dart';
 
 class UserPositionMarker extends StatefulWidget {
   final MapPosition position;

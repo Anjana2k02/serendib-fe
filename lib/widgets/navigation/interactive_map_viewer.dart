@@ -62,10 +62,6 @@ class _InteractiveMapViewerState extends State<InteractiveMapViewer>
     });
   }
 
-  void _resetView() {
-    _animateToPosition(const Offset(500, 400), scale: 1.0);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Consumer<MapNavigationProvider>(

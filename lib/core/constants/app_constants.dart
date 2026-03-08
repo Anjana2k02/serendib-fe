@@ -1,6 +1,5 @@
-import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:serendib/core/config/env_config.dart';
 
 /// App-wide constants
 class AppConstants {
@@ -40,8 +39,10 @@ class AppConstants {
   // Edge Insets
   static const EdgeInsets paddingAll = EdgeInsets.all(spacingMd);
   static const EdgeInsets paddingAllLg = EdgeInsets.all(spacingLg);
-  static const EdgeInsets paddingHorizontal = EdgeInsets.symmetric(horizontal: spacingMd);
-  static const EdgeInsets paddingVertical = EdgeInsets.symmetric(vertical: spacingMd);
+  static const EdgeInsets paddingHorizontal =
+      EdgeInsets.symmetric(horizontal: spacingMd);
+  static const EdgeInsets paddingVertical =
+      EdgeInsets.symmetric(vertical: spacingMd);
 
   // App Specific
   static const int onboardingQuestionCount = 5;
@@ -51,38 +52,30 @@ class AppConstants {
   static const String userDataKey = 'user_data';
 
   // API Configuration
-  // Automatically selects the correct backend URL based on platform
-  static String get baseUrl {
-    if (kIsWeb) {
-      // For web/Chrome, use localhost
-      return 'http://localhost:8080';
-    } else {
-      // For Android/iOS
-      try {
-        if (Platform.isAndroid) {
-          // Android emulator special IP to access host machine
-          return 'http://10.0.2.2:8080';
-        } else if (Platform.isIOS) {
-          // iOS simulator can use localhost
-          return 'http://localhost:8080';
-        } else {
-          // Physical devices - use your computer's IP
-          return 'http://10.138.45.13:8080';
-        }
-      } catch (e) {
-        // Fallback for physical devices
-        return 'http://10.138.45.13:8080';
-      }
-    }
-  }
-
+  static String get baseUrl => EnvConfig.backendUrl;
   static const String apiVersion = '/api/v1';
   static String get apiBaseUrl => '$baseUrl$apiVersion';
 
   // API Endpoints
   static String get loginEndpoint => '$apiBaseUrl/auth/login';
   static String get registerEndpoint => '$apiBaseUrl/auth/register';
+  static String get googleAuthEndpoint => '$apiBaseUrl/auth/google';
   static String get artifactsEndpoint => '$apiBaseUrl/artifacts';
+  static String get feedbackEndpoint => '$apiBaseUrl/feedback';
+  static String get usersEndpoint => '$apiBaseUrl/users';
+
+  // FastAPI ML Backend
+  static const String mlBaseUrl = 'http://192.168.1.170:8000';
+  static const String predictEndpoint = '$mlBaseUrl/predict';
+  static const String translateEndpoint = '$mlBaseUrl/translate';
+  static const String artifactByIdEndpoint = '$mlBaseUrl/artifact';
+  static const String generateDescriptionEndpoint =
+      '$mlBaseUrl/generate-description';
+
+  // Google OAuth2
+  // Replace with your Web Client ID from Google Cloud Console / Firebase
+  static const String googleWebClientId =
+      'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com';
 
   // HTTP Headers
   static const String contentTypeJson = 'application/json';

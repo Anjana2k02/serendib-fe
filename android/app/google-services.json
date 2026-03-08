@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "176133725327",
+    "project_id": "serendib-d3b88",
+    "storage_bucket": "serendib-d3b88.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:176133725327:android:ae03a384717aedece364fa",
+        "android_client_info": {
+          "package_name": "com.example.serendib"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "176133725327-qo7i1dbmt2u6c1j03a55ar4kjhsg7q9h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkUBW7pGFCxRxkvp5tYsYSuIW0bw8ocT8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "176133725327-qo7i1dbmt2u6c1j03a55ar4kjhsg7q9h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

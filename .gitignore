@@ -31,6 +31,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+pubspec.lock
 
 # Symbolication related
 app.*.symbols
@@ -42,6 +43,14 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Android local configuration
+android/local.properties
+android/.gradle/
+android/captures/
+android/gradlew
+android/gradlew.bat
+android/gradle/wrapper/gradle-wrapper.jar
 
 # iOS
 **/ios/**/*.mode1v3
@@ -68,7 +77,32 @@ app.*.map.json
 **/ios/Flutter/ephemeral
 **/ios/Flutter/app.flx
 **/ios/Flutter/app.zip
-**/ios/Flutter/flutter_assets/
+**Firebase (keep firebase_options.dart but ignore local config)
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+
+# Editor and IDE
+.vscode/launch.json
+.vscode/settings.json
+*.code-workspace
+
+# Test coverage
+coverage/
+
+# Temporary files
+*.tmp
+*.temp
+*.orig
+*.rej
+*~
+
+# /ios/Flutter/flutter_assets/
 **/ios/Flutter/flutter_export_environment.sh
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
