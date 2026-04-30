@@ -2,17 +2,12 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import '../../providers/dev_options_provider.dart';
 
 // ---------------------------------------------------------------------------
 // Data models
 // ---------------------------------------------------------------------------
-class _Node {
-  final String key;
-  final double px;
-  final double py;
-  const _Node(this.key, this.px, this.py);
-}
-
 class _MapLocation {
   final int id;
   final String name;
@@ -29,17 +24,18 @@ class IndoorMapScreen extends StatefulWidget {
 }
 
 class _IndoorMapScreenState extends State<IndoorMapScreen> {
-  List<List<Offset>> routeSegments = [];
-  Map<String, _Node> _nodes = {};
-  Map<String, List<_NodeEdge>> _adjacency = {};
-  List<_MapLocation> _locations = [];
+  static const double _minMapScale = 0.3;
+  static const double _maxMapScale = 5.0;
 
-  _Node? _startNode;
-  _Node? _endNode;
-  List<Offset> _shortestPath = [];
+  final TransformationController _transformationController =
+      TransformationController();
+
+  List<List<Offset>> routeSegments = [];
+  List<_MapLocation> _locations = [];
 
   bool isLoading = true;
   String errorMessage = '';
+  bool _hasInitializedMapView = false;
 
   // QGIS extent
   static const double minX = -398.762948004;
@@ -57,13 +53,17 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
     _loadAll();
   }
 
+  @override
+  void dispose() {
+    _transformationController.dispose();
+    super.dispose();
+  }
+
   Offset _geoToPixel(double geoX, double geoY) {
     final px = (geoX - minX) / (maxX - minX) * mapWidth;
     final py = (1 - (geoY - minY) / (maxY - minY)) * mapHeight;
     return Offset(px, py);
   }
-
-  String _nodeKey(double px, double py) => '${px.round()}_${py.round()}';
 
   Future<void> _loadAll() async {
     setState(() { isLoading = true; errorMessage = ''; });
@@ -80,8 +80,6 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
     final data = jsonDecode(raw) as Map<String, dynamic>;
     final features = data['features'] as List<dynamic>;
     final segments = <List<Offset>>[];
-    final nodes = <String, _Node>{};
-    final adjacency = <String, List<_NodeEdge>>{};
 
     for (final feature in features) {
       final geometry = feature['geometry'] as Map<String, dynamic>;
@@ -98,29 +96,13 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
         final seg = <Offset>[];
         for (final coord in line) {
           final c = coord as List<dynamic>;
-          final p = _geoToPixel((c[0] as num).toDouble(), (c[1] as num).toDouble());
-          seg.add(p);
-          final key = _nodeKey(p.dx, p.dy);
-          nodes.putIfAbsent(key, () => _Node(key, p.dx, p.dy));
+          seg.add(_geoToPixel((c[0] as num).toDouble(), (c[1] as num).toDouble()));
         }
         if (seg.isNotEmpty) segments.add(seg);
-
-        for (int i = 0; i < seg.length - 1; i++) {
-          final aKey = _nodeKey(seg[i].dx, seg[i].dy);
-          final bKey = _nodeKey(seg[i + 1].dx, seg[i + 1].dy);
-          if (aKey == bKey) continue;
-          final dx = seg[i].dx - seg[i + 1].dx;
-          final dy = seg[i].dy - seg[i + 1].dy;
-          final w = sqrt(dx * dx + dy * dy);
-          adjacency.putIfAbsent(aKey, () => []).add(_NodeEdge(bKey, w));
-          adjacency.putIfAbsent(bKey, () => []).add(_NodeEdge(aKey, w));
-        }
       }
     }
 
     routeSegments = segments;
-    _nodes = nodes;
-    _adjacency = adjacency;
   }
 
   Future<void> _loadLocations() async {
@@ -144,89 +126,30 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
     _locations = locs;
   }
 
-  _Node? _nearestNode(Offset tapPx) {
-    _Node? best;
-    double bestDist = double.infinity;
-    for (final n in _nodes.values) {
-      final dx = n.px - tapPx.dx;
-      final dy = n.py - tapPx.dy;
-      final d = dx * dx + dy * dy;
-      if (d < bestDist) { bestDist = d; best = n; }
+  void _scheduleInitialMapView(Size viewportSize) {
+    if (_hasInitializedMapView ||
+        viewportSize.width <= 0 ||
+        viewportSize.height <= 0) {
+      return;
     }
-    return best;
-  }
 
-  void _selectNode(_Node nearest) {
-    setState(() {
-      if (_startNode == null) {
-        _startNode = nearest;
-        _endNode = null;
-        _shortestPath = [];
-      } else if (_endNode == null) {
-        _endNode = nearest;
-        _shortestPath = _dijkstra(_startNode!.key, nearest.key);
-      } else {
-        _startNode = nearest;
-        _endNode = null;
-        _shortestPath = [];
-      }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _hasInitializedMapView) return;
+
+      final fitScale = min(
+        viewportSize.width / mapWidth,
+        viewportSize.height / mapHeight,
+      );
+      final initialScale = min(1.0, max(_minMapScale, fitScale));
+      final dx = (viewportSize.width - mapWidth * initialScale) / 2;
+      final dy = (viewportSize.height - mapHeight * initialScale) / 2;
+
+      _transformationController.value = Matrix4.identity()
+        ..setTranslationRaw(dx, dy, 0.0)
+        ..scaleByDouble(initialScale, initialScale, 1.0, 1.0);
+
+      _hasInitializedMapView = true;
     });
-  }
-
-  void _onMapTap(TapUpDetails details) {
-    if (_nodes.isEmpty) return;
-    final nearest = _nearestNode(details.localPosition);
-    if (nearest != null) _selectNode(nearest);
-  }
-
-  void _onLocationTap(_MapLocation loc) {
-    final nearest = _nearestNode(Offset(loc.px, loc.py));
-    if (nearest != null) _selectNode(nearest);
-  }
-
-  List<Offset> _dijkstra(String startKey, String endKey) {
-    if (startKey == endKey) {
-      final n = _nodes[startKey];
-      return n != null ? [Offset(n.px, n.py)] : [];
-    }
-
-    final dist = <String, double>{startKey: 0.0};
-    final prev = <String, String>{};
-    final visited = <String>{};
-    final queue = <_DijkstraEntry>[_DijkstraEntry(startKey, 0.0)];
-
-    while (queue.isNotEmpty) {
-      queue.sort((a, b) => a.dist.compareTo(b.dist));
-      final cur = queue.removeAt(0);
-      if (visited.contains(cur.key)) continue;
-      visited.add(cur.key);
-      if (cur.key == endKey) break;
-
-      for (final edge in _adjacency[cur.key] ?? []) {
-        if (visited.contains(edge.toKey)) continue;
-        final newDist = (dist[cur.key] ?? double.infinity) + edge.weight;
-        if (newDist < (dist[edge.toKey] ?? double.infinity)) {
-          dist[edge.toKey] = newDist;
-          prev[edge.toKey] = cur.key;
-          queue.add(_DijkstraEntry(edge.toKey, newDist));
-        }
-      }
-    }
-
-    if (!prev.containsKey(endKey)) return [];
-
-    final path = <Offset>[];
-    String? cur = endKey;
-    while (cur != null) {
-      final n = _nodes[cur];
-      if (n != null) path.insert(0, Offset(n.px, n.py));
-      cur = prev[cur];
-    }
-    return path;
-  }
-
-  void _reset() {
-    setState(() { _startNode = null; _endNode = null; _shortestPath = []; });
   }
 
   // -------------------------------------------------------------------------
@@ -263,17 +186,16 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
   // -------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
+    final devOptions = context.watch<DevOptionsProvider>();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Museum Indoor Map'),
-        actions: [
-          if (_startNode != null)
-            IconButton(
-              icon: const Icon(Icons.refresh),
-              tooltip: 'Clear selection',
-              onPressed: _reset,
-            ),
-        ],
+        bottom: devOptions.developerOptionsEnabled
+            ? PreferredSize(
+                preferredSize: const Size.fromHeight(48),
+                child: _buildDevBar(devOptions),
+              )
+            : null,
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -290,62 +212,40 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
                     ],
                   ),
                 )
-              : Column(
-                  children: [
-                    _buildStatusBar(),
-                    Expanded(
-                      child: InteractiveViewer(
-                        constrained: false,
-                        minScale: 0.3,
-                        maxScale: 5.0,
-                        child: GestureDetector(
-                          onTapUp: _onMapTap,
-                          child: SizedBox(
-                            width: mapWidth,
-                            height: mapHeight,
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                // PNG map
-                                Image.asset(
-                                  'assets/maps/indoor_map.png',
-                                  width: mapWidth,
-                                  height: mapHeight,
-                                  fit: BoxFit.fill,
-                                ),
-                                // Dashed route network
-                                CustomPaint(
-                                  size: const Size(mapWidth, mapHeight),
-                                  painter: _NetworkPainter(routeSegments: routeSegments),
-                                ),
-                                // Shortest path
-                                if (_shortestPath.length >= 2)
-                                  CustomPaint(
-                                    size: const Size(mapWidth, mapHeight),
-                                    painter: _ShortestPathPainter(path: _shortestPath),
-                                  ),
-                                // Location markers
-                                ..._locations.map((loc) => _buildLocationMarker(loc)),
-                                // Start / end pins
-                                if (_startNode != null)
-                                  Positioned(
-                                    left: _startNode!.px - 12,
-                                    top: _startNode!.py - 28,
-                                    child: const Icon(Icons.location_on, color: Colors.green, size: 28),
-                                  ),
-                                if (_endNode != null)
-                                  Positioned(
-                                    left: _endNode!.px - 12,
-                                    top: _endNode!.py - 28,
-                                    child: const Icon(Icons.flag, color: Colors.red, size: 28),
-                                  ),
-                              ],
+              : LayoutBuilder(
+                  builder: (context, constraints) {
+                    _scheduleInitialMapView(constraints.biggest);
+
+                    return InteractiveViewer(
+                      transformationController: _transformationController,
+                      constrained: false,
+                      minScale: _minMapScale,
+                      maxScale: _maxMapScale,
+                      child: SizedBox(
+                        width: mapWidth,
+                        height: mapHeight,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            // PNG map
+                            Image.asset(
+                              'assets/maps/indoor_map.png',
+                              width: mapWidth,
+                              height: mapHeight,
+                              fit: BoxFit.fill,
                             ),
-                          ),
+                            // Dashed route network
+                            CustomPaint(
+                              size: const Size(mapWidth, mapHeight),
+                              painter: _NetworkPainter(routeSegments: routeSegments),
+                            ),
+                            // Location markers
+                            ..._locations.map((loc) => _buildLocationMarker(loc)),
+                          ],
                         ),
                       ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
     );
   }
@@ -357,11 +257,9 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
     return Positioned(
       left: loc.px - 14,
       top:  loc.py - 14,
-      child: GestureDetector(
-        onTap: () => _onLocationTap(loc),
-        child: Opacity(
-          opacity: 0.7,
-          child: Column(
+      child: Opacity(
+        opacity: 0.7,
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
@@ -395,45 +293,56 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
             ),
           ],
         ),
-        ),
       ),
     );
   }
 
-  Widget _buildStatusBar() {
-    final String msg;
-    if (_startNode == null) {
-      msg = 'Tap a location or the map to set start';
-    } else if (_endNode == null) {
-      msg = 'Now tap a location or map to set destination';
-    } else if (_shortestPath.isEmpty) {
-      msg = 'No path found — tap to reset';
-    } else {
-      msg = 'Route found  •  tap map to reset';
-    }
+  Widget _buildDevBar(DevOptionsProvider devOptions) {
+    const labelStyle = TextStyle(color: Colors.white70, fontSize: 11);
+    const dropdownStyle = TextStyle(color: Colors.white, fontSize: 12);
 
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: Colors.blue.shade50,
-      child: Text(msg, style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.w600)),
+      color: Colors.black54,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      child: Row(
+        children: [
+          const Text('Loc:', style: labelStyle),
+          const SizedBox(width: 4),
+          DropdownButton<String>(
+            value: devOptions.selectedLocation,
+            isDense: true,
+            dropdownColor: Colors.brown.shade800,
+            style: dropdownStyle,
+            underline: const SizedBox.shrink(),
+            iconEnabledColor: Colors.white70,
+            items: DevOptionsProvider.locations
+                .map((l) => DropdownMenuItem(value: l, child: Text(l, style: dropdownStyle)))
+                .toList(),
+            onChanged: (v) {
+              if (v != null) context.read<DevOptionsProvider>().setSelectedLocation(v);
+            },
+          ),
+          const SizedBox(width: 16),
+          const Text('Activity:', style: labelStyle),
+          const SizedBox(width: 4),
+          DropdownButton<String>(
+            value: devOptions.selectedActivity,
+            isDense: true,
+            dropdownColor: Colors.brown.shade800,
+            style: dropdownStyle,
+            underline: const SizedBox.shrink(),
+            iconEnabledColor: Colors.white70,
+            items: DevOptionsProvider.activities
+                .map((a) => DropdownMenuItem(value: a, child: Text(a, style: dropdownStyle)))
+                .toList(),
+            onChanged: (v) {
+              if (v != null) context.read<DevOptionsProvider>().setSelectedActivity(v);
+            },
+          ),
+        ],
+      ),
     );
   }
-}
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-class _NodeEdge {
-  final String toKey;
-  final double weight;
-  _NodeEdge(this.toKey, this.weight);
-}
-
-class _DijkstraEntry {
-  final String key;
-  final double dist;
-  _DijkstraEntry(this.key, this.dist);
 }
 
 // ---------------------------------------------------------------------------
@@ -473,27 +382,4 @@ class _NetworkPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_NetworkPainter old) => old.routeSegments != routeSegments;
-}
-
-class _ShortestPathPainter extends CustomPainter {
-  final List<Offset> path;
-  _ShortestPathPainter({required this.path});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (path.length < 2) return;
-    final paint = Paint()
-      ..color = Colors.blue
-      ..strokeWidth = 3.0
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    final p = Path()..moveTo(path[0].dx, path[0].dy);
-    for (final pt in path.skip(1)) { p.lineTo(pt.dx, pt.dy); }
-    canvas.drawPath(p, paint);
-  }
-
-  @override
-  bool shouldRepaint(_ShortestPathPainter old) => old.path != path;
 }
