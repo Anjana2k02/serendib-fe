@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../providers/dev_options_provider.dart';
+import '../../providers/artifact_provider.dart';
+import '../../widgets/category_artifacts_sheet.dart';
 
 // ---------------------------------------------------------------------------
 // Data models
@@ -37,6 +39,10 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
   String errorMessage = '';
   bool _hasInitializedMapView = false;
 
+  // Tap detection inside InteractiveViewer
+  Offset? _interactionStartFocalPoint;
+  bool _isInteractionPan = false;
+
   // QGIS extent
   static const double minX = -398.762948004;
   static const double maxX = 1894.154789944;
@@ -44,19 +50,75 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
   static const double maxY = -18.077619119;
 
   // PNG dimensions
-  static const double mapWidth  = 1069;
-  static const double mapHeight = 656;
+  static const double mapWidth  = 940;
+  static const double mapHeight = 1281;
 
   @override
   void initState() {
     super.initState();
     _loadAll();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = context.read<ArtifactProvider>();
+      if (provider.artifacts.isEmpty && !provider.isLoading) {
+        provider.fetchArtifacts();
+      }
+    });
   }
 
   @override
   void dispose() {
     _transformationController.dispose();
     super.dispose();
+  }
+
+  // -------------------------------------------------------------------------
+  // Tap detection via InteractiveViewer interaction callbacks
+  // -------------------------------------------------------------------------
+  void _onInteractionStart(ScaleStartDetails details) {
+    _interactionStartFocalPoint = details.focalPoint;
+    _isInteractionPan = false;
+  }
+
+  void _onInteractionUpdate(ScaleUpdateDetails details) {
+    if (details.focalPointDelta.distance > 6.0 ||
+        (details.scale - 1.0).abs() > 0.02) {
+      _isInteractionPan = true;
+    }
+  }
+
+  void _onInteractionEnd(ScaleEndDetails details) {
+    if (!_isInteractionPan && _interactionStartFocalPoint != null) {
+      _handleMapTap(_interactionStartFocalPoint!);
+    }
+    _interactionStartFocalPoint = null;
+    _isInteractionPan = false;
+  }
+
+  void _handleMapTap(Offset globalFocalPoint) {
+    final box = context.findRenderObject() as RenderBox?;
+    if (box == null) return;
+
+    // Convert from global screen coords → local widget coords → map coords
+    final localPos = box.globalToLocal(globalFocalPoint);
+    final matrix = _transformationController.value;
+    final inverse = Matrix4.inverted(matrix);
+    final mapPos = MatrixUtils.transformPoint(inverse, localPos);
+
+    // Hit-test: find first artifact marker within 22 px radius
+    const double hitRadius = 22.0;
+    for (final loc in _locations) {
+      final dx = loc.px - mapPos.dx;
+      final dy = loc.py - mapPos.dy;
+      if (dx * dx + dy * dy <= hitRadius * hitRadius) {
+        if (_isArtifactLocation(loc.name)) {
+          final artifacts = context
+              .read<ArtifactProvider>()
+              .getArtifactsForLocation(loc.name);
+          showCategoryArtifactsSheet(context, loc.name, artifacts);
+        }
+        return;
+      }
+    }
   }
 
   Offset _geoToPixel(double geoX, double geoY) {
@@ -221,6 +283,9 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
                       constrained: false,
                       minScale: _minMapScale,
                       maxScale: _maxMapScale,
+                      onInteractionStart: _onInteractionStart,
+                      onInteractionUpdate: _onInteractionUpdate,
+                      onInteractionEnd: _onInteractionEnd,
                       child: SizedBox(
                         width: mapWidth,
                         height: mapHeight,
@@ -250,15 +315,26 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
     );
   }
 
+  bool _isArtifactLocation(String name) {
+    final n = name.toLowerCase();
+    return !n.contains('entrance') &&
+        !n.contains('exit') &&
+        !n.contains('toilet') &&
+        !n.contains('wc') &&
+        !n.contains('rest') &&
+        !n.contains('outdoor');
+  }
+
   Widget _buildLocationMarker(_MapLocation loc) {
     final color = _colorFor(loc.name);
     final icon  = _iconFor(loc.name);
+    final isArtifact = _isArtifactLocation(loc.name);
 
     return Positioned(
       left: loc.px - 14,
       top:  loc.py - 14,
       child: Opacity(
-        opacity: 0.7,
+        opacity: isArtifact ? 1.0 : 0.7,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
