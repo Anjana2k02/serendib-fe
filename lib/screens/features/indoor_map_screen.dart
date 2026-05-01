@@ -15,7 +15,11 @@ class _MapLocation {
   final String name;
   final double px;
   final double py;
-  const _MapLocation({required this.id, required this.name, required this.px, required this.py});
+  const _MapLocation(
+      {required this.id,
+      required this.name,
+      required this.px,
+      required this.py});
 }
 
 class IndoorMapScreen extends StatefulWidget {
@@ -34,6 +38,8 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
 
   List<List<Offset>> routeSegments = [];
   List<_MapLocation> _locations = [];
+  List<_MapLocation> _userLocations = [];
+  _MapLocation? _selectedUserLocation;
 
   bool isLoading = true;
   String errorMessage = '';
@@ -49,8 +55,8 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
   static const double minY = -1423.829054721;
   static const double maxY = -18.077619119;
 
-  // PNG dimensions
-  static const double mapWidth  = 940;
+  // Map dimensions for the indoor map raster asset.
+  static const double mapWidth = 940;
   static const double mapHeight = 1281;
 
   @override
@@ -128,12 +134,18 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
   }
 
   Future<void> _loadAll() async {
-    setState(() { isLoading = true; errorMessage = ''; });
+    setState(() {
+      isLoading = true;
+      errorMessage = '';
+    });
     try {
-      await Future.wait([_loadRoutes(), _loadLocations()]);
+      await Future.wait([_loadRoutes(), _loadLocations(), _loadUserLocations()]);
       setState(() => isLoading = false);
     } catch (e) {
-      setState(() { errorMessage = 'Failed to load map data: $e'; isLoading = false; });
+      setState(() {
+        errorMessage = 'Failed to load map data: $e';
+        isLoading = false;
+      });
     }
   }
 
@@ -151,14 +163,23 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
       if (type == 'LineString') {
         lines = [geometry['coordinates'] as List<dynamic>];
       } else if (type == 'MultiLineString') {
-        lines = (geometry['coordinates'] as List<dynamic>).map((l) => l as List<dynamic>).toList();
+        lines = (geometry['coordinates'] as List<dynamic>)
+            .map((l) => l as List<dynamic>)
+            .toList();
       }
 
       for (final line in lines) {
         final seg = <Offset>[];
         for (final coord in line) {
           final c = coord as List<dynamic>;
-          seg.add(_geoToPixel((c[0] as num).toDouble(), (c[1] as num).toDouble()));
+          // Route GeoJSON uses image-space coordinates with the Y axis growing
+          // upward, so we flip it to match Flutter's top-left canvas origin.
+          seg.add(
+            Offset(
+              (c[0] as num).toDouble(),
+              mapHeight - (c[1] as num).toDouble(),
+            ),
+          );
         }
         if (seg.isNotEmpty) segments.add(seg);
       }
@@ -168,7 +189,8 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
   }
 
   Future<void> _loadLocations() async {
-    final raw = await rootBundle.loadString('assets/map-routes/location.geojson');
+    final raw =
+        await rootBundle.loadString('assets/map-routes/location.geojson');
     final data = jsonDecode(raw) as Map<String, dynamic>;
     final features = data['features'] as List<dynamic>;
     final locs = <_MapLocation>[];
@@ -176,7 +198,8 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
     for (final feature in features) {
       final props = feature['properties'] as Map<String, dynamic>;
       final coords = (feature['geometry']['coordinates'] as List<dynamic>);
-      final p = _geoToPixel((coords[0] as num).toDouble(), (coords[1] as num).toDouble());
+      final p = _geoToPixel(
+          (coords[0] as num).toDouble(), (coords[1] as num).toDouble());
       locs.add(_MapLocation(
         id: (props['id'] as num).toInt(),
         name: props['name'] as String,
@@ -186,6 +209,27 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
     }
 
     _locations = locs;
+  }
+
+  Future<void> _loadUserLocations() async {
+    final raw =
+        await rootBundle.loadString('assets/user/userlocation.geojson');
+    final data = jsonDecode(raw) as Map<String, dynamic>;
+    final features = data['features'] as List<dynamic>;
+    final locs = <_MapLocation>[];
+
+    for (final feature in features) {
+      final props = feature['properties'] as Map<String, dynamic>;
+      final coords = (feature['geometry']['coordinates'] as List<dynamic>);
+      locs.add(_MapLocation(
+        id: (props['id'] as num).toInt(),
+        name: props['name'] as String,
+        px: (coords[0] as num).toDouble(),
+        py: mapHeight - (coords[1] as num).toDouble(),
+      ));
+    }
+
+    _userLocations = locs;
   }
 
   void _scheduleInitialMapView(Size viewportSize) {
@@ -225,19 +269,27 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
     if (n.contains('rest')) return Icons.chair;
     if (n.contains('outdoor')) return Icons.park;
     if (n.contains('gallery') || n.contains('art')) return Icons.museum;
-    if (n.contains('crown') || n.contains('royal')) return Icons.workspace_premium;
+    if (n.contains('crown') || n.contains('royal')) {
+      return Icons.workspace_premium;
+    }
     if (n.contains('coin')) return Icons.monetization_on;
     if (n.contains('cloth')) return Icons.checkroom;
-    if (n.contains('statue') || n.contains('skulture')) return Icons.accessibility_new;
+    if (n.contains('statue') || n.contains('skulture')) {
+      return Icons.accessibility_new;
+    }
     if (n.contains('mask')) return Icons.theater_comedy;
-    if (n.contains('weapon') || n.contains('sword') || n.contains('wepon')) return Icons.gavel;
+    if (n.contains('weapon') || n.contains('sword') || n.contains('wepon')) {
+      return Icons.gavel;
+    }
     if (n.contains('pottery')) return Icons.emoji_food_beverage;
     return Icons.place;
   }
 
   Color _colorFor(String name) {
     final n = name.toLowerCase();
-    if (n.contains('entrance') || n.contains('exit')) return Colors.green.shade700;
+    if (n.contains('entrance') || n.contains('exit')) {
+      return Colors.green.shade700;
+    }
     if (n.contains('toilet') || n.contains('rest')) return Colors.blue.shade600;
     if (n.contains('outdoor')) return Colors.teal.shade600;
     return const Color(0xFF6D4C41); // brown for artifacts
@@ -268,9 +320,11 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
                     children: [
                       const Icon(Icons.error, color: Colors.red, size: 50),
                       const SizedBox(height: 10),
-                      Text(errorMessage, style: const TextStyle(color: Colors.red)),
+                      Text(errorMessage,
+                          style: const TextStyle(color: Colors.red)),
                       const SizedBox(height: 10),
-                      ElevatedButton(onPressed: _loadAll, child: const Text('Retry')),
+                      ElevatedButton(
+                          onPressed: _loadAll, child: const Text('Retry')),
                     ],
                   ),
                 )
@@ -292,20 +346,25 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
                         child: Stack(
                           clipBehavior: Clip.none,
                           children: [
-                            // PNG map
+                            // Base indoor map image.
                             Image.asset(
                               'assets/maps/indoor_map.png',
                               width: mapWidth,
                               height: mapHeight,
                               fit: BoxFit.fill,
                             ),
-                            // Dashed route network
+                            // Indoor walking paths from routes.geojson.
                             CustomPaint(
                               size: const Size(mapWidth, mapHeight),
-                              painter: _NetworkPainter(routeSegments: routeSegments),
+                              painter:
+                                  _NetworkPainter(routeSegments: routeSegments),
                             ),
                             // Location markers
-                            ..._locations.map((loc) => _buildLocationMarker(loc)),
+                            ..._locations
+                                .map((loc) => _buildLocationMarker(loc)),
+                            // Selected user location marker
+                            if (_selectedUserLocation != null)
+                              _buildUserLocationMarker(_selectedUserLocation!),
                           ],
                         ),
                       ),
@@ -327,12 +386,12 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
 
   Widget _buildLocationMarker(_MapLocation loc) {
     final color = _colorFor(loc.name);
-    final icon  = _iconFor(loc.name);
+    final icon = _iconFor(loc.name);
     final isArtifact = _isArtifactLocation(loc.name);
 
     return Positioned(
       left: loc.px - 14,
-      top:  loc.py - 14,
+      top: loc.py - 14,
       child: Opacity(
         opacity: isArtifact ? 1.0 : 0.7,
         child: Column(
@@ -363,12 +422,59 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
               ),
               child: Text(
                 loc.name,
-                style: const TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 7,
+                    fontWeight: FontWeight.w600),
                 textAlign: TextAlign.center,
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildUserLocationMarker(_MapLocation loc) {
+    return Positioned(
+      left: loc.px - 18,
+      top: loc.py - 18,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: Colors.blue.shade700,
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.blue.withValues(alpha: 0.4),
+                  blurRadius: 8,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: const Icon(Icons.person_pin, color: Colors.white, size: 20),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            decoration: BoxDecoration(
+              color: Colors.blue.shade700.withValues(alpha: 0.9),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              loc.name,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 8,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -385,17 +491,24 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
           const Text('Loc:', style: labelStyle),
           const SizedBox(width: 4),
           DropdownButton<String>(
-            value: devOptions.selectedLocation,
+            value: _selectedUserLocation?.name,
+            hint: Text('Select...', style: dropdownStyle),
             isDense: true,
             dropdownColor: Colors.brown.shade800,
             style: dropdownStyle,
             underline: const SizedBox.shrink(),
             iconEnabledColor: Colors.white70,
-            items: DevOptionsProvider.locations
-                .map((l) => DropdownMenuItem(value: l, child: Text(l, style: dropdownStyle)))
+            items: _userLocations
+                .map((l) => DropdownMenuItem(
+                    value: l.name, child: Text(l.name, style: dropdownStyle)))
                 .toList(),
             onChanged: (v) {
-              if (v != null) context.read<DevOptionsProvider>().setSelectedLocation(v);
+              if (v != null) {
+                setState(() {
+                  _selectedUserLocation =
+                      _userLocations.firstWhere((l) => l.name == v);
+                });
+              }
             },
           ),
           const SizedBox(width: 16),
@@ -409,10 +522,13 @@ class _IndoorMapScreenState extends State<IndoorMapScreen> {
             underline: const SizedBox.shrink(),
             iconEnabledColor: Colors.white70,
             items: DevOptionsProvider.activities
-                .map((a) => DropdownMenuItem(value: a, child: Text(a, style: dropdownStyle)))
+                .map((a) => DropdownMenuItem(
+                    value: a, child: Text(a, style: dropdownStyle)))
                 .toList(),
             onChanged: (v) {
-              if (v != null) context.read<DevOptionsProvider>().setSelectedActivity(v);
+              if (v != null) {
+                context.read<DevOptionsProvider>().setSelectedActivity(v);
+              }
             },
           ),
         ],
@@ -431,27 +547,33 @@ class _NetworkPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (routeSegments.isEmpty) return;
-    final paint = Paint()
-      ..color = Colors.grey.withValues(alpha: 0.55)
-      ..strokeWidth = 1.8
+    final pathPaint = Paint()
+      ..color = const Color(0xFF9AA0A6).withValues(alpha: 0.95)
+      ..strokeWidth = 2.6
       ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
 
     for (final seg in routeSegments) {
       if (seg.isEmpty) continue;
       final path = Path()..moveTo(seg[0].dx, seg[0].dy);
-      for (final pt in seg.skip(1)) { path.lineTo(pt.dx, pt.dy); }
-      _drawDashed(canvas, path, paint);
+      for (final pt in seg.skip(1)) {
+        path.lineTo(pt.dx, pt.dy);
+      }
+      _drawDashedPath(canvas, path, pathPaint);
     }
   }
 
-  void _drawDashed(Canvas canvas, Path path, Paint paint) {
-    const dash = 7.0, gap = 5.0;
-    for (final m in path.computeMetrics()) {
-      double d = 0;
-      while (d < m.length) {
-        canvas.drawPath(m.extractPath(d, (d + dash).clamp(0.0, m.length)), paint);
-        d += dash + gap;
+  void _drawDashedPath(Canvas canvas, Path path, Paint paint) {
+    const dashLength = 10.0;
+    const gapLength = 7.0;
+
+    for (final metric in path.computeMetrics()) {
+      double distance = 0;
+      while (distance < metric.length) {
+        final end = (distance + dashLength).clamp(0.0, metric.length);
+        canvas.drawPath(metric.extractPath(distance, end), paint);
+        distance += dashLength + gapLength;
       }
     }
   }
