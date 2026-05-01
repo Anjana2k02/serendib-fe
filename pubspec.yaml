@@ -59,6 +59,12 @@ dependencies:
   # 3d controller
   flutter_3d_controller: ^2.3.0
 
+  # Sensor access (accelerometer, gyroscope)
+  sensors_plus: ^5.0.0
+
+  # WebSocket communication
+  web_socket_channel: ^2.4.0
+
 
 dev_dependencies:
   flutter_test:
