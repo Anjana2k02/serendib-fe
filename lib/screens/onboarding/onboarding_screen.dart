@@ -5,9 +5,15 @@ import '../../models/onboarding_question.dart';
 import '../../models/country.dart';
 import '../../services/storage_service.dart';
 import '../../services/country_service.dart';
+import '../../services/onboarding_api_service.dart';
 
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({super.key});
+  final bool isUpdateMode;
+  
+  const OnboardingScreen({
+    super.key,
+    this.isUpdateMode = false,
+  });
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -148,12 +154,55 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ))
         .toList();
 
-    final storage = StorageService();
-    await storage.saveOnboardingResponses(responses);
-    await storage.setOnboardingCompleted(true);
+    if (widget.isUpdateMode) {
+      // In update mode, show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(color: AppColors.primaryBrown),
+        ),
+      );
 
-    if (mounted) {
-      Navigator.of(context).pushReplacementNamed('/register');
+      try {
+        final apiService = OnboardingApiService();
+        await apiService.submitOnboardingResponse(responses: responses);
+        
+        // Also update local storage just in case
+        final storage = StorageService();
+        await storage.saveOnboardingResponses(responses);
+        
+        if (mounted) {
+          Navigator.of(context).pop(); // dismiss loading dialog
+          Navigator.of(context).pop(); // go back to profile
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Preferences updated successfully'),
+              backgroundColor: AppColors.success,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          Navigator.of(context).pop(); // dismiss loading dialog
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to update preferences: $e'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      }
+    } else {
+      // Initial onboarding flow
+      final storage = StorageService();
+      await storage.saveOnboardingResponses(responses);
+      await storage.setOnboardingCompleted(true);
+
+      if (mounted) {
+        Navigator.of(context).pushReplacementNamed('/register');
+      }
     }
   }
 
